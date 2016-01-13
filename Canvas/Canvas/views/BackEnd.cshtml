@@ -1,0 +1,380 @@
+﻿@inherits UmbracoViewPage<Canvas.Models.CanvasView>
+@using Canvas.Helpers;
+@using Canvas.Models;
+@using System.Text.RegularExpressions;
+
+@{
+    var model = Repository.GetObjectByPage(Model.page);
+    
+    @RenderControlsInArea(Model.alias, model, Model.page)
+}
+
+
+@helper RenderControlsInArea(string alias, CanvasModel model, IContent page)
+{
+    
+    var area = CanvasHelper.GetAreaByAlias(model.Areas, alias);
+
+    if (area != null)
+    { 
+        <div class="canvas-area @(area.Controls.Any() ? "" : "canvas-area-empty")" data-area="@alias">
+
+            @if (area.Controls.Any())
+            {
+
+                foreach (var control in area.Controls)
+                {
+                        
+                    string templatePath = string.Empty;
+                        
+                    if (!string.IsNullOrEmpty(control.Template)) {
+                            
+                        if (System.IO.File.Exists(Server.MapPath(control.Template)))
+                        {
+                            templatePath = control.Template;
+                        }
+                             
+                    }
+                        
+                    <div class="canvas-control" data-controlId="@control.ControlID" data-controlType="@control.Type">
+
+                        <div class="canvas-control-actions">
+                            <a href="#" class="canvas-action-edit">Edit</a>
+                            <a href="#" class="canvas-action-delete">Delete</a>
+                            <a href="#" class="canvas-action-move">Move</a>
+                        </div>
+                                
+                        <div class="canvas-control-content">
+
+                            @if (control.Type == "Grid")
+                            {
+                               @RenderGridControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "RichText")
+                            {
+                                @RenderTextControl(control,page,templatePath,model)
+                            } else if (control.Type == "Text") 
+                            {
+                                @RenderTextControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "Heading")
+                            {
+                                @RenderHeadingControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "Button") {
+                                @RenderButtonControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "Media") {
+                                @RenderMediaControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "Macro") {
+                                @RenderMacroControl(control,page,templatePath,model)
+                            }
+                            else if (control.Type == "Section") {
+                                @RenderSectionControl(control,page,templatePath,model)
+                            }
+
+                        </div>
+
+                        <span class="canvas-border canvas-border-top"></span>
+                        <span class="canvas-border canvas-border-right"></span>
+                        <span class="canvas-border canvas-border-bottom"></span>
+                        <span class="canvas-border canvas-border-left"></span>
+
+                    </div>
+                        
+                }
+                    
+            }
+
+        </div>
+    } 
+
+}
+
+@helper RenderGridControl(Canvas.Models.CanvasControl control, IContent page,string templatePath, CanvasModel model) {
+    
+    string _columns = control.Columns;
+    string Class = control.Class;
+                                                        
+    string[] cols = _columns.Split(';');
+
+    int c = 0;
+                                                    
+    string columns = "";
+    string row = "";    
+                                                                                                                                                     
+    if (!string.IsNullOrEmpty(templatePath))
+    {
+        var obj = new ViewDataDictionary();
+
+        obj.Add("columns", cols);
+        obj.Add("class", Class);
+
+        foreach (var col in cols)
+        {
+
+            if (!string.IsNullOrEmpty(col))
+            {
+                                                                                                                    
+                var colNumber = col.Split(':')[0];
+                var screen = col.Split(':')[1];
+                var config = col.Split(':')[2];
+
+                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+
+                obj.Add("column" + c, RenderControlsInArea(areaAlias,model,page));
+
+                c++;
+                                                                    
+            }
+
+        }
+
+        row = Html.Partial("~" + templatePath,page,obj).ToString();
+        
+    } else {
+
+        foreach (var col in cols)
+        {
+
+            if (!string.IsNullOrEmpty(col))
+            {
+
+                var colNumber = col.Split(':')[0];
+                var screen = col.Split(':')[1];
+                var config = col.Split(':')[2];
+
+                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+
+                columns += "<div class='col-" + screen + "-" + colNumber + " " + config + "'>" +
+                    RenderControlsInArea(areaAlias,model,page) +
+                    "</div>";
+
+                c++;
+
+            }
+
+        }
+        
+        row = "<div class='row " + Class + "'>" + columns + "</div>";
+    }
+                                
+    @Html.Raw(HttpUtility.HtmlDecode(row))
+    
+}
+
+@helper RenderSectionControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string body = "";
+    
+    string Class = control.Class;
+
+    string areaAlias = "section-" + control.ControlID;
+
+    string mediaId = control.Item;
+    string imageUrl = "";
+                                                       
+    if (!String.IsNullOrEmpty(mediaId))
+    {
+        var media = Umbraco.TypedMedia(mediaId);
+
+        if (media != null)
+        {
+            imageUrl = media.Url;
+        }
+    }
+                                                        
+    body = "<section class='" + Class + "' " + (!string.IsNullOrEmpty(imageUrl) ? "style=background-image:url(" + imageUrl + ");" : "") + " >" +
+        "<div class='container'>" +
+            RenderControlsInArea(areaAlias,model,page) +
+        "</div>" +
+        "</section>";
+                                                        
+    if (!string.IsNullOrEmpty(templatePath))
+    {
+        var obj = new ViewDataDictionary();
+
+        obj.Add("class", Class);
+        obj.Add("media", imageUrl);
+        obj.Add("area", RenderControlsInArea(areaAlias,model, page));
+
+        body = Html.Partial("~" + templatePath,page,obj).ToString();
+    }
+                                
+    @Html.Raw(HttpUtility.HtmlDecode(body))
+                                                        
+}
+
+@helper RenderTextControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string body = control.Content;
+    string title = control.Title;
+
+    if (string.IsNullOrWhiteSpace(body))
+    {
+        body = "Write content here...";
+    }
+
+    if (control.Type  == "Text")
+    {
+        body = body.Replace(Environment.NewLine, "<br/>");
+    }
+
+    if (!string.IsNullOrEmpty(templatePath))
+    {
+        var obj = new ViewDataDictionary();
+
+        obj.Add("content", body);
+        obj.Add("title", title);
+
+        body = Html.Partial("~" + templatePath,page,obj).ToString();
+    }
+                              
+    @Html.Raw(HttpUtility.HtmlDecode(body))
+}
+
+@helper RenderHeadingControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string body = "";
+    string Class = control.Class;
+    string title = control.Title;
+    string heading = control.Columns;
+                                                
+    if (string.IsNullOrEmpty(heading))
+    {
+        heading = "h4";
+    }
+
+    if (string.IsNullOrEmpty(title))
+    {
+        body = "<div class='canvas-heading-placeholder'>No title set</div>";
+    }
+    else
+    {
+        body = "<" + heading + " class='" + Class + "'>" + title + "</" + heading + ">";
+    }
+                                                       
+
+    if (!string.IsNullOrEmpty(templatePath))
+    {
+        var obj = new ViewDataDictionary();
+
+        obj.Add("class", Class);
+        obj.Add("title", title);
+        obj.Add("heading", heading);
+                                                            
+        body = Html.Partial("~" + templatePath,page,obj).ToString();
+    }
+                                
+    @Html.Raw(HttpUtility.HtmlDecode(body)) 
+}
+
+@helper RenderButtonControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string body = "";
+    string Class = control.Class;
+    string title = control.Title;
+    string icon = control.Columns;
+    string url = control.Description;
+
+    string iconContent = "";
+
+    if (!string.IsNullOrEmpty(icon)) {
+        iconContent = "<i class='" + icon + "'></i>";
+    }
+                                                        
+    if (string.IsNullOrEmpty(title))
+    {
+        body = "<div class='canvas-button-placeholder'>No title set</div>";
+    } else {
+        body = "<a href='" + url + "' class='" + Class + "'>" + iconContent + title + "</a>";
+    }
+                                                        
+    if (!string.IsNullOrEmpty(templatePath))
+    {
+        var obj = new ViewDataDictionary();
+
+        obj.Add("class", Class);
+        obj.Add("title", title);
+        obj.Add("icon", icon);
+        obj.Add("url", url);
+                                                            
+        body = Html.Partial("~" + templatePath,page,obj).ToString();
+    }
+                                
+
+    @Html.Raw(HttpUtility.HtmlDecode(body))
+}
+
+@helper RenderMediaControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string mediaId = control.Item;
+                                
+    IPublishedContent media = null;
+
+    if (!String.IsNullOrEmpty(mediaId))
+    {
+        media = Umbraco.TypedMedia(mediaId);
+
+    }
+
+    if (media != null)
+    {
+
+        string title = control.Title;
+        string description = control.Description;
+
+        if (!string.IsNullOrEmpty(templatePath))
+        {
+            var obj = new ViewDataDictionary();
+
+            obj.Add("name", media.Name);
+            obj.Add("media", media.Url);
+            obj.Add("title", title);
+            obj.Add("description", description);
+
+            @Html.Partial("~" + templatePath,page, obj)
+
+        } else {
+            <img src="@media.Url" alt="@title"/>
+        }
+                                    
+    } else {
+        <div class="canvas-media-placeholder">No media set</div>
+    }
+}
+
+@helper RenderMacroControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
+{
+    string macroValue = control.Macro;
+                               
+    if (!string.IsNullOrEmpty(macroValue))
+    {
+                                                            
+        Match match = Regex.Match(macroValue, "macroAlias=(\"[^<>\"]*\"|'[^<>']*'|w+)", RegexOptions.IgnoreCase);
+                                                            
+        string macroAlias = match.Value.Replace("macroAlias=","").Replace("\"","");
+
+        Regex ItemRegex = new Regex("(\\S+)=(\"[^<>\"]*\"|'[^<>']*'|w+)", RegexOptions.IgnoreCase);
+
+        var parameters = new ViewDataDictionary();
+                                                            
+        foreach (Match ItemMatch in ItemRegex.Matches(macroValue))
+        {
+            var tag = ItemMatch.Value.Split('=')[0];
+            var value = ItemMatch.Value.Split('=')[1].Replace("\"", "");
+
+            parameters.Add(tag, value);
+        }
+                                                            
+                                                            
+        @Umbraco.RenderMacro(macroAlias,parameters)
+ 
+
+    } else {
+        <div class="canvas-macro-placeholder">
+            No macro selected
+        </div>
+    }
+}
