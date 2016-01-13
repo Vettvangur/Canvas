@@ -303,10 +303,10 @@ var CanvasApp = function () {
     app.areas = {
 
         init: function ($doc) {
-            this.MakeSortable($doc.find('.canvas-area'));
+            this.MakeSortable($doc.find('.canvas-area'),$doc);
         },
 
-        MakeSortable: function ($element) {
+        MakeSortable: function ($element,$doc) {
             var me = this;
 
             $($element).each(function () {
@@ -433,7 +433,7 @@ var CanvasApp = function () {
 
                     }
 
-                    app.areas.MakeSortable($('.canvas-area'));
+                    app.areas.MakeSortable($('.canvas-area'),$('body'));
 
                     app.control.editControl(json.controlId);
 
