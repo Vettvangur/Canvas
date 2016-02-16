@@ -147,7 +147,7 @@
 
                 string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
 
-                columns += "<div class='col-" + screen + "-" + colNumber + " " + config + "'>" +
+                columns += "<div class='column " + screen + "-" + colNumber + " " + config + "'>" +
                     RenderControlsInArea(areaAlias,model,page) +
                     "</div>";
 
@@ -185,7 +185,7 @@
         }
     }
                                                         
-    body = "<section class='" + Class + "' " + (!string.IsNullOrEmpty(imageUrl) ? "style=background-image:url(" + imageUrl + ");" : "") + " >" +
+    body = "<section class='column row " + Class + "' " + (!string.IsNullOrEmpty(imageUrl) ? "style=background-image:url(" + imageUrl + ");" : "") + " >" +
         "<div class='container'>" +
             RenderControlsInArea(areaAlias,model,page) +
         "</div>" +
@@ -348,18 +348,18 @@
 @helper RenderMacroControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
 {
     string macroValue = control.Macro;
-                               
+
     if (!string.IsNullOrEmpty(macroValue))
     {
-                                                            
+
         Match match = Regex.Match(macroValue, "macroAlias=(\"[^<>\"]*\"|'[^<>']*'|w+)", RegexOptions.IgnoreCase);
-                                                            
-        string macroAlias = match.Value.Replace("macroAlias=","").Replace("\"","");
+
+        string macroAlias = match.Value.Replace("macroAlias=", "").Replace("\"", "");
 
         Regex ItemRegex = new Regex("(\\S+)=(\"[^<>\"]*\"|'[^<>']*'|w+)", RegexOptions.IgnoreCase);
 
         var parameters = new ViewDataDictionary();
-                                                            
+
         foreach (Match ItemMatch in ItemRegex.Matches(macroValue))
         {
             var tag = ItemMatch.Value.Split('=')[0];
@@ -367,10 +367,20 @@
 
             parameters.Add(tag, value);
         }
-                                                            
-                                                            
-        @Umbraco.RenderMacro(macroAlias,parameters)
- 
+
+        if (!string.IsNullOrEmpty(templatePath))
+        {
+            var obj = new ViewDataDictionary();
+
+            obj.Add("alias", macroAlias);
+            obj.Add("parameters", parameters);
+
+            @Html.Partial("~" + templatePath, page, obj)
+
+        }
+        else {
+            @Umbraco.RenderMacro(macroAlias,parameters)
+        }
 
     } else {
         <div class="canvas-macro-placeholder">

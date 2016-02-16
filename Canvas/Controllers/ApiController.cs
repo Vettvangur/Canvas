@@ -12,6 +12,7 @@ using System.Web.Mvc;
 using Canvas.Models;
 using Umbraco.Core.Models;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace Canvas.Controllers
 {
@@ -228,9 +229,10 @@ namespace Canvas.Controllers
 
                         if (control.Type == "Macro")
                         {
-                            var db = DatabaseContext.Database;
-
-                            macros = db.Fetch<CanvasMacro>("SELECT * FROM cmsMacro where macroUseInEditor = @0 ORDER BY macroName", true);
+                            using (var db = DatabaseContext.Database)
+                            {
+                                macros = db.Fetch<CanvasMacro>("SELECT * FROM cmsMacro where macroUseInEditor = @0 ORDER BY macroName", true);
+                            }
                         }
 
                         var controlProperties = control.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(control, null) == null ? "" : x.GetValue(control, null)).ToList();
@@ -298,7 +300,7 @@ namespace Canvas.Controllers
                                 PropertyInfo prop = control.GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
                                 if (null != prop && prop.CanWrite)
                                 {
-                                    prop.SetValue(control, value, null);
+                                    prop.SetValue(control, HttpUtility.UrlDecode(value), null);
                                 }
 
                             }
@@ -489,30 +491,31 @@ namespace Canvas.Controllers
         public JsonResult GetMacroProperty(int id)
         {
 
-            var db = DatabaseContext.Database;
-
-            var properties = db.Fetch<CanvasMacroProperty>("SELECT * FROM cmsMacroProperty where macro = @0 ORDER BY macroPropertySortOrder", id);
-
-            if (CanvasHelper.GetUmbracoVersion() == 6)
+            using (var db = DatabaseContext.Database)
             {
+                var properties = db.Fetch<CanvasMacroProperty>("SELECT * FROM cmsMacroProperty where macro = @0 ORDER BY macroPropertySortOrder", id);
 
-                var macroPropertyTypes = db.Fetch<dynamic>("SELECT * FROM cmsMacroPropertyType");
-
-                foreach (var p in properties)
+                if (CanvasHelper.GetUmbracoVersion() == 6)
                 {
 
-                    var type = macroPropertyTypes.Where(x => x.id == p.macroPropertyType).FirstOrDefault();
+                    var macroPropertyTypes = db.Fetch<dynamic>("SELECT * FROM cmsMacroPropertyType");
 
-                    if (type != null)
+                    foreach (var p in properties)
                     {
-                        p.editorAlias = type.macroPropertyTypeRenderType;
+
+                        var type = macroPropertyTypes.Where(x => x.id == p.macroPropertyType).FirstOrDefault();
+
+                        if (type != null)
+                        {
+                            p.editorAlias = type.macroPropertyTypeRenderType;
+                        }
+
                     }
 
                 }
 
+                return Json(new { success = true, properties = properties });
             }
-
-            return Json(new { success = true, properties = properties });
         }
 
         [HttpPost]
@@ -594,9 +597,19 @@ namespace Canvas.Controllers
                 }
             }
 
-            var db = DatabaseContext.Database;
+            using (var db = DatabaseContext.Database)
+            {
 
-            string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src FROM umbracoNode as n " +
+                //string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src FROM umbracoNode as n " +
+                //"INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
+                //"RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
+                //"WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
+                //"trashed = 0 AND " +
+                //"(cmsPropertyData.propertytypeid = 6 OR cmsPropertyData.propertytypeid = 27 OR cmsPropertyData.propertytypeid = 24)  AND " +
+                //"(cmsContent.contentType = 1031 OR cmsContent.contentType = 1032 OR cmsContent.contentType = 1033) AND " +
+                //"parentId = " + id + " GROUP BY n.id";
+                
+                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src FROM umbracoNode as n " +
                 "INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
                 "RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
                 "WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
@@ -605,9 +618,11 @@ namespace Canvas.Controllers
                 "(cmsContent.contentType = 1031 OR cmsContent.contentType = 1032 OR cmsContent.contentType = 1033) AND " +
                 "parentId = " + id + " GROUP BY n.id";
 
-            var items = db.Fetch<CanvasMedia>(sql);
+                var items = db.Fetch<CanvasMedia>(sql);
 
-            return Json(new { items = items, history = Parents.OrderBy(x => x.level) });
+                return Json(new { items = items, history = Parents.OrderBy(x => x.level) });
+            }
+
         }
 
         private List<CanvasParents> Parents = new List<CanvasParents>();
@@ -696,22 +711,22 @@ namespace Canvas.Controllers
         public JsonResult SaveMacroTemplate(int id, string content)
         {
 
-            var db = DatabaseContext.Database;
-
-            var view = db.FirstOrDefault<string>("SELECT macroPython FROM cmsMacro WHERE id = @0", id);
-
-            if (System.IO.File.Exists(Server.MapPath(view)))
+            using (var db = DatabaseContext.Database)
             {
-                System.IO.File.WriteAllText(Server.MapPath(view), content, Encoding.UTF8);
+                var view = db.FirstOrDefault<string>("SELECT macroPython FROM cmsMacro WHERE id = @0", id);
+
+                if (System.IO.File.Exists(Server.MapPath(view)))
+                {
+                    System.IO.File.WriteAllText(Server.MapPath(view), content, Encoding.UTF8);
 
 
-                return Json(new { success = true });
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Template does not exist" });
+                }
             }
-            else
-            {
-                return Json(new { success = false, message = "Template does not exist" });
-            }
-
         }
 
         [HttpPost]
@@ -736,19 +751,20 @@ namespace Canvas.Controllers
         public JsonResult GetMacroTemplateValue(int id)
         {
 
-            var db = DatabaseContext.Database;
-
-            var view = db.FirstOrDefault<string>("SELECT macroPython FROM cmsMacro WHERE id = @0", id);
-
-            if (System.IO.File.Exists(Server.MapPath(view)))
+            using (var db = DatabaseContext.Database)
             {
-                var content = System.IO.File.ReadAllText(Server.MapPath(view), Encoding.UTF8);
+                var view = db.FirstOrDefault<string>("SELECT macroPython FROM cmsMacro WHERE id = @0", id);
 
-                return Json(new { success = true, content = content });
-            }
-            else
-            {
-                return Json(new { success = false, message = "Template with this name does not exist" });
+                if (System.IO.File.Exists(Server.MapPath(view)))
+                {
+                    var content = System.IO.File.ReadAllText(Server.MapPath(view), Encoding.UTF8);
+
+                    return Json(new { success = true, content = content });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Template with this name does not exist" });
+                }
             }
 
         }

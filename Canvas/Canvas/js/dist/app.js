@@ -10,13 +10,25 @@ var CanvasApp = function () {
     // App Parameters
     // -----------
     app.params = {
-
+        $body: function() {
+            return $('body');
+        },
         apiUrl: '/umbraco/canvas/api',
         pageId: function () {
             return $('input[name=canvas-pageId]').val();
         },
         version: function () {
             return $('input[name=canvas-version]').val();
+        },
+        getIframeContent: function() {
+            var iframe = document.getElementById('canvas-iframe');
+
+            return iframe.contentDocument;
+        },
+        getIframeWindow: function () {
+            var iframe = document.getElementById('canvas-iframe');
+
+            return iframe.contentWindow;
         },
         controls: ["Grid", "Section", "Macro", "RichText", "Media", "Text", "Heading", "Button"],
         controlIndex: 0,
@@ -87,13 +99,10 @@ var CanvasApp = function () {
         init: function () {
             var me = this;
 
-            if (window.location.pathname.indexOf('.aspx') <= -1) {
-                me.wrapper();
-                me.render();
-                me.screenOptions();
-                me.controlMenu();
-            }
-
+            me.wrapper();
+            me.render();
+            me.screenOptions();
+            me.controlMenu();
 
         },
 
@@ -102,38 +111,41 @@ var CanvasApp = function () {
 
             $('body').wrapInner("<div class='canvas-pageWrapper'></div>");
 
-            if (window.location.pathname.indexOf('.aspx') <= -1) {
-                $('.canvas-pageWrapper').hide();
+            $('.canvas-pageWrapper').hide();
 
-                app.controlMenu.init();
+            $('.canvas-pageWrapper').find('*:not(.canvas-settings, .canvas-settings *)').remove();
 
-                var iframe = document.createElement('iframe');
+            app.controlMenu.init();
 
-                iframe.src = '/umbraco/dialogs/Preview.aspx?id=' + app.params.pageId();
-                iframe.className = 'canvas-iframe';
-                iframe.width = '100%';
-                iframe.onload = function () {
-                    app.areas.init($(iframe.contentDocument));
-                    app.control.init($(iframe.contentDocument));
-                };
+            var iframe = document.createElement('iframe');
 
-                document.body.appendChild(iframe);
+            iframe.src = '/umbraco/dialogs/Preview.aspx?id=' + app.params.pageId();
+            iframe.id = "canvas-iframe";
+            iframe.width = '100%';
+            iframe.onload = function () {
+                app.areas.init(iframe.contentDocument);
+                app.control.init($(iframe.contentDocument));
 
-                $('body').addClass('canvas-body');
+                app.helpers.loader.stop();
+            };
+
+            document.body.appendChild(iframe);
+
+            $('body').addClass('canvas-body');
                 
-                me.resizeIframe();
+            me.resizeIframe();
 
-                $(window).resize(function () {
-                    me.resizeIframe();
-                });
-            }
+            $(window).resize(function () {
+                me.resizeIframe();
+            });
+            
 
         },
 
         resizeIframe: function() {
             var height = $(window).height();
 
-            $('.canvas-iframe').css('height', height - 60);
+            $('#canvas-iframe').css('height', height - 60);
         },
 
         render: function () {
@@ -190,7 +202,7 @@ var CanvasApp = function () {
                     width = "320px";
                 }
 
-                $('.canvas-pageWrapper').attr('style','width:' + width);
+                $('#canvas-iframe').attr('style', 'width:' + width);
 
             });
 
@@ -247,9 +259,9 @@ var CanvasApp = function () {
 
         makeControlsDraggable: function () {
 
-            var el = document.getElementById('canvas-controls')
+            var el = document.getElementById('canvas-controls');
 
-            var sortable = new Sortable(el, {
+            Sortable.create(el, {
                 group: {
                     name: 'controls',
                     put: false,
@@ -261,9 +273,6 @@ var CanvasApp = function () {
                 chosenClass: "canvas-sortable-chosen",  // Class name for the chosen item
                 draggable: ".canvas-control",  // Specifies which items inside the element should be sortable
                 animation: 0,
-                forceFallback: true,
-                fallbackClass: "canvas-sortable-fallback",
-                fallbackOnBody: true,
                 setData: function (dataTransfer, dragEl) {
                     dataTransfer.setData('Text', dragEl.textContent);
                 },
@@ -271,13 +280,15 @@ var CanvasApp = function () {
                 // dragging started
                 onStart: function (/**Event*/evt) {
                     $('.canvas-menu,.canvas-window,canvas-overlay').removeClass('canvas-open');
-                    $('body').addClass('canvas-ui-dragging');
+
+                    $(app.params.getIframeContent()).find('body').addClass('canvas-ui-dragging');
                 },
 
                 // dragging ended
                 onEnd: function (/**Event*/evt) {
                     $('.canvas-menu').addClass('canvas-open');
-                    $('body').removeClass('canvas-ui-dragging');
+
+                    $(app.params.getIframeContent()).find('body').removeClass('canvas-ui-dragging');
 
                     var $item = $(evt.item);
 
@@ -286,15 +297,11 @@ var CanvasApp = function () {
                     }
                 }
             });
-
         },
 
         resizeList: function () {
 
-            var height = 0;
-            var windowHeight = $(window).height();
-
-            $('.canvas-menu').css('height', windowHeight - 60);
+            app.helpers.resizeWindow($('.canvas-menu'));
 
         },
 
@@ -302,18 +309,20 @@ var CanvasApp = function () {
 
     app.areas = {
 
-        init: function ($doc) {
-            this.MakeSortable($doc.find('.canvas-area'),$doc);
+        init: function (doc) {
+            this.MakeSortable(doc);
         },
 
-        MakeSortable: function ($element,$doc) {
+        MakeSortable: function (doc) {
             var me = this;
 
-            $($element).each(function () {
+            var $elements = $(doc).find(".canvas-area");
 
-                var $container = $(this);
+            $($elements).each(function () {
 
-                var sortable = new Sortable($container[0], {
+                var $element = $(this);
+
+                Sortable.create($element[0], {
 
                     group: {
                         name: 'controls',
@@ -337,14 +346,13 @@ var CanvasApp = function () {
 
                     // dragging started
                     onStart: function (evt) {
-                        $doc.find('.canvas-menu,.canvas-window,canvas-overlay').removeClass('canvas-open');
-                        $doc.find('body').addClass('canvas-ui-dragging');
+                        app.params.$body().find('.canvas-menu,.canvas-window,canvas-overlay').removeClass('canvas-open');
+                        app.params.$body().addClass('canvas-ui-dragging');
                     },
 
                     // dragging ended
                     onEnd: function (evt) {
-
-                        $doc.find('body').removeClass('canvas-ui-dragging');
+                        app.params.$body().removeClass('canvas-ui-dragging');
                     },
 
                     // Element is dropped into the list from another list
@@ -390,8 +398,8 @@ var CanvasApp = function () {
 
                     }
                 });
-
             });
+
 
         },
 
@@ -433,7 +441,7 @@ var CanvasApp = function () {
 
                     }
 
-                    app.areas.MakeSortable($('.canvas-area'),$('body'));
+                    app.areas.MakeSortable($(app.params.getIframeContent()).find('body'));
 
                     app.control.editControl(json.controlId);
 
@@ -480,7 +488,7 @@ var CanvasApp = function () {
                 $widgetWrapper.prepend(actions).find('.canvas-control-content').prepend('<div class="canvas-macro-placeholder">No macro selected</div>');
             } else if (controlType == 'Section') {
                 // Section control
-                content = '<section><div class="container"><div class="canvas-area" data-area="section-' + controlId + '"></div></div></section>';
+                content = '<section class="row column"><div class="container"><div class="canvas-area" data-area="section-' + controlId + '"></div></div></section>';
                 $widgetWrapper.prepend(actions).find('.canvas-control-content').prepend(content);
             } else if (controlType == 'Heading') {
                 $widgetWrapper.prepend(actions).find('.canvas-control-content').prepend('<div class="canvas-heading-placeholder">No title set</div>');
@@ -614,9 +622,21 @@ var CanvasApp = function () {
 
                     $window.append($form).addClass('canvas-open');
 
+                    var simple = tinymce.get('canvas-editor-simple');
+
+                    if (simple != null) {
+                        simple.remove();
+                    }
+
                     tinymce.init(app.params.tinyMceConfig);
 
                     me.postEdit($form.find('form'));
+
+                    app.helpers.resizeWindow($('.canvas-window'));
+
+                    $(window).on('resize', function () {
+                        app.helpers.resizeWindow($('.canvas-window'));
+                    });
 
                 }
             });
@@ -644,7 +664,7 @@ var CanvasApp = function () {
 
                         var input = $(this).find('input,textarea,select');
 
-                        var inputValue = input.val();
+                        var inputValue = app.helpers.escapeHtml.run(input.val());
                         var inputAlias = input.attr('name');
 
                         var $inputMacroValue = $inputMacro.val();
@@ -655,7 +675,7 @@ var CanvasApp = function () {
                                 inputValue = input.is(':checked') ? '1' : '0';
                             }
 
-                            var re = new RegExp(inputAlias + "=(\"[^<>\"]*\"|'[^<>']*'|\w+)", "g");
+                            var re = new RegExp(inputAlias + "=(\"[^\"]*\"|'[^']*'|\w+)", "g");
 
                             if ($inputMacroValue.indexOf(inputAlias + "=") > -1) {
                                 $inputMacroValue = $inputMacroValue.replace(re, inputAlias + "='" + inputValue + "'")
@@ -696,10 +716,12 @@ var CanvasApp = function () {
                     data: $form.serialize(),
                     success: function (json) {
 
-                        window.location.reload();
+                        app.params.getIframeWindow().location.reload();
+                        $button.removeAttr('disabled');
                     },
                     error: function (a, b, c) {
                         app.helpers.loader.stop();
+                        $button.removeAttr('disabled');
                     }
                 });
 
@@ -755,7 +777,7 @@ var CanvasApp = function () {
                         break;
                     case "Template":
 
-                        if (controlType == "Media" || controlType == "RichText" || controlType == "Text" || controlType == "Section" || controlType == "Grid" || controlType == "Heading" || controlType == "Button") {
+                        if (controlType == "Media" || controlType == "RichText" || controlType == "Text" || controlType == "Section" || controlType == "Grid" || controlType == "Heading" || controlType == "Button" || controlType == "Macro") {
 
                             $property = $('<div class="canvas-control-group canvas-clearfix">'
                                 + '<label for="' + propertyName + '">' + propertyName + ' <a href="#" class="canvas-template-new" style="float:right; margin-left:10px;">New</a> <a href="#" class="canvas-template-edit" style="float:right; margin-left:10px;">Edit</a></label>'
@@ -971,7 +993,7 @@ var CanvasApp = function () {
 
                     property = $('<div class="canvas-control-group">'
                      + '<label for="' + alias + '">' + name + '</label>'
-                     + '<textarea name="' + alias + '" rows="6" id="' + alias + '">' + value + '</textarea>'
+                     + '<textarea name="' + alias + '" rows="6" id="' + alias + '">' + app.helpers.descapeHtml.run(value) + '</textarea>'
                      + '</div>');
 
                 } else if (contentType == 'Umbraco.Textbox' || contentType == 'text') {
@@ -1399,7 +1421,7 @@ var CanvasApp = function () {
 
                                     if (json.success) {
 
-                                        location.reload();
+                                        app.params.getIframeWindow().location.reload();
 
                                     } else {
                                         alert(json.message);
@@ -1645,6 +1667,12 @@ var CanvasApp = function () {
 
                             $window.append('<a href="#" class="canvas-window-close">Close window</a>').append($form).addClass('canvas-open');
 
+                            var simple = tinymce.get('canvas-editor-simple');
+
+                            if (simple != null) {
+                                simple.remove();
+                            }
+
                             tinymce.init(app.params.tinyMceConfig);
 
                             $form.on('click', '.canvas-Tab h4', function (e) {
@@ -1666,7 +1694,8 @@ var CanvasApp = function () {
                                     data: $form.serialize(),
                                     success: function (json) {
 
-                                        window.location.reload();
+                                        app.params.getIframeWindow().location.reload();
+                                        $form.find('button[type=submit]').removeAttr('disabled').text('Save');
                                     },
                                     error: function (a, b, c) {
                                         app.helpers.loader.stop();
@@ -1760,12 +1789,17 @@ var CanvasApp = function () {
 
                 };
 
+                var advanced = tinymce.get('canvas-advanced-content');
+
+                if (advanced != null) {
+                    advanced.remove();
+                }
+
                 tinymce.init(baseLineConfigObj);
 
                 var data = tinymce.get('canvas-editor-simple').getContent();
 
                 tinymce.get('canvas-advanced-content').setContent(data);
-
 
                 $editor.on('click', '.canvas-btn-secondary', function (e) {
                     e.preventDefault();
@@ -1923,6 +1957,12 @@ var CanvasApp = function () {
                         overlap.find('.canvas-content-container').append(list);
 
                         $('body').append(overlap.fadeIn());
+
+                        app.helpers.resizeWindow($('.canvas-overlap'));
+
+                        $(window).on('resize', function () {
+                            app.helpers.resizeWindow($('.canvas-overlap'));
+                        });
 
                     }
                 });
@@ -2352,8 +2392,15 @@ var CanvasApp = function () {
             $('body').on('click', '.canvas-window-close', function (e) {
                 e.preventDefault();
 
-                $(this).closest('.canvas-window').removeClass('canvas-open');
+                $window = $(this).closest('.canvas-window');
+
+                $window.removeClass('canvas-open');
                 $(this).closest('.canvas-overlap').hide();
+
+                setTimeout(function () {
+                    $window.html('');
+                },300);
+
             });
 
         },
@@ -2428,7 +2475,7 @@ var CanvasApp = function () {
 
                             me.removeAttr('disabled');
 
-                            location.reload();
+                            app.params.getIframeWindow().location.reload();
                         },
                         error: function (a, b, c) {
 
@@ -2471,6 +2518,49 @@ var CanvasApp = function () {
                 }
             }
             return qsJsonObject;
+        },
+
+        resizeWindow: function ($w) {
+            var height = 0;
+            var windowHeight = $(window).height();
+
+            $w.css('height', windowHeight - 60);
+        },
+
+        escapeHtml: {
+            map: {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': '&quot;',
+                "'": '&#39;',
+                "/": '&#x2F;',
+                "\n": "&lt;br&gt;"
+            },
+
+            run: function (string) {
+
+                var me = this;
+
+                return String(string).replace(/[&<>"'\/]|[\n]/g, function (s) {
+                    return me.map[s];
+                });
+            }
+        },
+
+        descapeHtml: {
+            map: {
+                "&lt;br&gt;": "\n"
+            },
+
+            run: function (string) {
+
+                var me = this;
+
+                return String(string).replace(/&lt;br&gt;/g, function (s) {
+                    return me.map[s];
+                });
+            }
         }
 
     };
@@ -2478,14 +2568,13 @@ var CanvasApp = function () {
     // initializer
     // -----------
     app.initialize = (function () {
+
         app.bar.init();
-        //app.controlMenu.init();
         app.pickers.init();
         app.modules.init();
         app.helpers.init();
-
         $('body').append('<div class="canvas-window"></div>')
-
+        
         // globalize scope
         CanvasApp = app;
 

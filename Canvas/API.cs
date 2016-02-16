@@ -27,17 +27,23 @@ namespace Canvas
         {
             string results = string.Empty;
 
+            var isAuthenticated = Authorize.isAuthenticated();
 
-            if (Authorize.isAuthenticated())
+            if (isAuthenticated && !HttpContext.Current.Request.Path.Contains(".aspx"))
             {
 
                 string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
-                string codemirrorCss = "<link href=\"/Umbraco/lib/codemirror/lib/codemirror.css\" type=\"text/css\" rel=\"stylesheet\">";      
+                string codemirrorCss = "<link href=\"/Umbraco/lib/codemirror/lib/codemirror.css\" type=\"text/css\" rel=\"stylesheet\">";
                 string pageId = "<input type=\"hidden\" name=\"canvas-pageId\" value=\"" + UmbracoContext.Current.PageId.ToString() + "\" />";
                 string builder = "<script src=\"/app_plugins/canvas/js/libs/builder.js\"></script>";
 
-                results = css + codemirrorCss + pageId + builder;
+                results = "<div class='canvas-settings'>" + css + codemirrorCss + pageId + builder + "</div>";
 
+            }
+            else if (isAuthenticated) {
+                string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
+
+                results = "<div class='canvas-settings'>" + css + "</div>";
             }
 
             return new HtmlString(results);

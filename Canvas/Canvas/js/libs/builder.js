@@ -1,4 +1,5 @@
-﻿if (!window.jQuery) {
+﻿
+if (!window.jQuery) {
 
     (function () {
         // Load the script
@@ -52,4 +53,6 @@ window.tinyMCEPreInit = {
     suffix: '.min',
     query: ''
 };
+
+
 

@@ -14,20 +14,21 @@ namespace Canvas.Models
         public int sortOrder { get; set; }
         public string text { get; set; }
         public int contentType { get; set; }
+        public string src { get; set; }
 
-        private string _src;
-        public string src
-        {
-            set
-            {
-                var json = JObject.Parse(value);
+        //private string _src;
+        //public string src
+        //{
+        //    set
+        //    {
+        //        var json = JObject.Parse(value);
 
-                _src = (string)json["src"];
-            }
-            get
-            {
-                return _src;
-            }
-        }
+        //        _src = (string)json["src"];
+        //    }
+        //    get
+        //    {
+        //        return _src;
+        //    }
+        //}
     }
 }
