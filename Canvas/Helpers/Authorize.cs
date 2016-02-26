@@ -54,7 +54,6 @@ namespace Canvas.Helpers
 
         public static IUser GetCurrentUser()
         {
-
             var ticket = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
 
             if (ticket != null)
@@ -64,6 +63,7 @@ namespace Canvas.Helpers
 
                 if (!string.IsNullOrEmpty(username))
                 {
+
                     IUser u = ApplicationContext.Current.Services.UserService.GetByUsername(username);
 
                     if (u != null)

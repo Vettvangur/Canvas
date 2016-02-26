@@ -211,7 +211,7 @@
     string body = control.Content;
     string title = control.Title;
 
-    if (string.IsNullOrWhiteSpace(body))
+    if (string.IsNullOrWhiteSpace(body) && string.IsNullOrWhiteSpace(title))
     {
         body = "Write content here...";
     }
