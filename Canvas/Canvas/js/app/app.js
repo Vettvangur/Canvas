@@ -151,7 +151,7 @@ var CanvasApp = function () {
         render: function () {
             var $bar = $('<div><div class="canvas-bar"><div class="canvas-left"></div><div class="canvas-right"></div></div></div>');
 
-            $bar.find('.canvas-bar .canvas-left').append('<div class="canvas-item canvas-item-logo canvas-border-right"><img src="/app_plugins/canvas/content/svg/vettvangur.svg" style=width:40px; height:20px;" alt="Vettvangur"/></div>');
+            $bar.find('.canvas-bar .canvas-left').append('<div class="canvas-item canvas-item-logo canvas-border-right"><a href="/umbraco#/content/content/edit/' + app.params.pageId() + '" target="_blank"><img src="/app_plugins/canvas/content/svg/vettvangur.svg" style=width:40px; height:20px;" alt="Vettvangur"/></a></div>');
             $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-menu canvasicon-menu"></a>');
             $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-templates canvasicon-papers"></a>');
 
@@ -718,6 +718,7 @@ var CanvasApp = function () {
 
                         app.params.getIframeWindow().location.reload();
                         $button.removeAttr('disabled');
+                        app.helpers.isPagePublished();
                     },
                     error: function (a, b, c) {
                         app.helpers.loader.stop();
@@ -800,7 +801,7 @@ var CanvasApp = function () {
                         break;
                     case "Item":
 
-                        if (controlType == "Media" || controlType == "Section") {
+                        if (controlType == "Media" || controlType == "Section" || controlType == "Grid") {
 
                             $property = me.build('Umbraco.MediaPicker', propertyName, propertyName, propertyValue);
 
@@ -1422,6 +1423,7 @@ var CanvasApp = function () {
                                     if (json.success) {
 
                                         app.params.getIframeWindow().location.reload();
+                                        app.helpers.isPagePublished();
 
                                     } else {
                                         alert(json.message);
@@ -1696,6 +1698,7 @@ var CanvasApp = function () {
 
                                         app.params.getIframeWindow().location.reload();
                                         $form.find('button[type=submit]').removeAttr('disabled').text('Save');
+                                        app.helpers.isPagePublished();
                                     },
                                     error: function (a, b, c) {
                                         app.helpers.loader.stop();

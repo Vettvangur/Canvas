@@ -93,73 +93,87 @@
 }
 
 @helper RenderGridControl(Canvas.Models.CanvasControl control, IContent page,string templatePath, CanvasModel model) {
-    
-    string _columns = control.Columns;
-    string Class = control.Class;
-                                                        
-    string[] cols = _columns.Split(';');
 
-    int c = 0;
-                                                    
-    string columns = "";
-    string row = "";    
-                                                                                                                                                     
-    if (!string.IsNullOrEmpty(templatePath))
+string _columns = control.Columns;
+string Class = control.Class;
+
+string[] cols = _columns.Split(';');
+
+int c = 0;
+
+string columns = "";
+string row = "";
+
+string mediaId = control.Item;
+string imageUrl = "";
+
+if (!String.IsNullOrEmpty(mediaId))
+{
+    var media = Umbraco.TypedMedia(mediaId);
+
+    if (media != null)
     {
-        var obj = new ViewDataDictionary();
-
-        obj.Add("columns", cols);
-        obj.Add("class", Class);
-
-        foreach (var col in cols)
-        {
-
-            if (!string.IsNullOrEmpty(col))
-            {
-                                                                                                                    
-                var colNumber = col.Split(':')[0];
-                var screen = col.Split(':')[1];
-                var config = col.Split(':')[2];
-
-                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
-
-                obj.Add("column" + c, RenderControlsInArea(areaAlias,model,page));
-
-                c++;
-                                                                    
-            }
-
-        }
-
-        row = Html.Partial("~" + templatePath,page,obj).ToString();
-        
-    } else {
-
-        foreach (var col in cols)
-        {
-
-            if (!string.IsNullOrEmpty(col))
-            {
-
-                var colNumber = col.Split(':')[0];
-                var screen = col.Split(':')[1];
-                var config = col.Split(':')[2];
-
-                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
-
-                columns += "<div class='column " + screen + "-" + colNumber + " " + config + "'>" +
-                    RenderControlsInArea(areaAlias,model,page) +
-                    "</div>";
-
-                c++;
-
-            }
-
-        }
-        
-        row = "<div class='row " + Class + "'>" + columns + "</div>";
+        imageUrl = media.Url;
     }
-                                
+}
+
+if (!string.IsNullOrEmpty(templatePath))
+{
+    var obj = new ViewDataDictionary();
+
+    obj.Add("columns", cols);
+    obj.Add("class", Class);
+    obj.Add("media", imageUrl);
+
+    foreach (var col in cols)
+    {
+
+        if (!string.IsNullOrEmpty(col))
+        {
+
+            var colNumber = col.Split(':')[0];
+            var screen = col.Split(':')[1];
+            var config = col.Split(':')[2];
+
+            string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+
+            obj.Add("column" + c, RenderControlsInArea(areaAlias,model,page));
+
+            c++;
+
+        }
+
+    }
+
+    row = Html.Partial("~" + templatePath,page,obj).ToString();
+
+} else {
+
+    foreach (var col in cols)
+    {
+
+        if (!string.IsNullOrEmpty(col))
+        {
+
+            var colNumber = col.Split(':')[0];
+            var screen = col.Split(':')[1];
+            var config = col.Split(':')[2];
+
+            string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+
+            columns += "<div class='column " + screen + "-" + colNumber + " " + config + "'>" +
+                RenderControlsInArea(areaAlias,model,page) +
+                "</div>";
+
+            c++;
+
+        }
+
+    }
+
+    row = "<div class='row " + Class + "'>" + columns + "</div>";
+}
+
     @Html.Raw(HttpUtility.HtmlDecode(row))
     
 }

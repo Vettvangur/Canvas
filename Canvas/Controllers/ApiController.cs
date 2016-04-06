@@ -600,16 +600,7 @@ namespace Canvas.Controllers
             using (var db = DatabaseContext.Database)
             {
 
-                //string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src FROM umbracoNode as n " +
-                //"INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
-                //"RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
-                //"WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
-                //"trashed = 0 AND " +
-                //"(cmsPropertyData.propertytypeid = 6 OR cmsPropertyData.propertytypeid = 27 OR cmsPropertyData.propertytypeid = 24)  AND " +
-                //"(cmsContent.contentType = 1031 OR cmsContent.contentType = 1032 OR cmsContent.contentType = 1033) AND " +
-                //"parentId = " + id + " GROUP BY n.id";
-                
-                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src FROM umbracoNode as n " +
+                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src FROM umbracoNode as n " +
                 "INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
                 "RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
                 "WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
@@ -617,6 +608,15 @@ namespace Canvas.Controllers
                 "(cmsPropertyData.propertytypeid = 6 OR cmsPropertyData.propertytypeid = 27 OR cmsPropertyData.propertytypeid = 24)  AND " +
                 "(cmsContent.contentType = 1031 OR cmsContent.contentType = 1032 OR cmsContent.contentType = 1033) AND " +
                 "parentId = " + id + " GROUP BY n.id";
+                
+                //string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src FROM umbracoNode as n " +
+                //"INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
+                //"RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
+                //"WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
+                //"trashed = 0 AND " +
+                //"(cmsPropertyData.propertytypeid = 6 OR cmsPropertyData.propertytypeid = 27 OR cmsPropertyData.propertytypeid = 24)  AND " +
+                //"(cmsContent.contentType = 1031 OR cmsContent.contentType = 1032 OR cmsContent.contentType = 1033) AND " +
+                //"parentId = " + id + " GROUP BY n.id";
 
                 var items = db.Fetch<CanvasMedia>(sql);
 
