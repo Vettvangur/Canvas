@@ -16,19 +16,17 @@ namespace Canvas.Models
         public int contentType { get; set; }
         //public string src { get; set; }
 
-        private string _src;
+        public string src1 { get; set; }
+        public string src2 { get; set; }
+
+        //private string _src;
         public string src
         {
-            set
-            {
-                var json = JObject.Parse(value);
-
-                _src = (string)json["src"];
-            }
             get
             {
-                return _src;
+                return string.IsNullOrEmpty(src1) ? src2 : src1;
             }
+
         }
     }
 }

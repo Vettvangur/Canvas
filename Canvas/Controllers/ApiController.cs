@@ -13,6 +13,8 @@ using Canvas.Models;
 using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Web;
+using Archetype.Models;
+using System.Web.Script.Serialization;
 
 namespace Canvas.Controllers
 {
@@ -600,7 +602,7 @@ namespace Canvas.Controllers
             using (var db = DatabaseContext.Database)
             {
 
-                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src FROM umbracoNode as n " +
+                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src1, MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src2 FROM umbracoNode as n " +
                 "INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
                 "RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
                 "WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
@@ -933,6 +935,194 @@ namespace Canvas.Controllers
                     IteriateNodes(children);
                 }
 
+            }
+
+        }
+        public ActionResult ConvertuEditToCanvas()
+        {
+
+            var cs = Services.ContentService;
+
+            GetAllNodes();
+
+            foreach (var node in allNodes)
+            {
+
+                Log.Info("Trying to convert node: " + node.Id);
+
+                var uEditObject = JsonConvert.DeserializeObject<Archetype.Models.ArchetypeModel>(node.GetValue<string>("uEdit"));
+
+                // Store all areas to fetch sections and grids later
+                var alluEditAreas = uEditObject.Fieldsets.ToList();
+
+                CanvasModel = new CanvasModel();
+
+                // Get only root areas
+                foreach (var fieldset in alluEditAreas.Where(x => !x.Properties.Take(1).First().Value.ToString().Contains("section-") && !x.Properties.Take(1).First().Value.ToString().Contains("grid-")))
+                {
+                    // get area property
+                    var areaProperty = fieldset.Properties.Take(1).FirstOrDefault();
+                    var areaControls = fieldset.Properties.Skip(1).Take(1).FirstOrDefault();
+
+                    IteriateThroughControlsInArea(areaProperty, areaControls, alluEditAreas, null);
+
+                }
+
+                var newCanvasJson = new JavaScriptSerializer().Serialize(CanvasModel);
+
+                node.SetValue("canvas", newCanvasJson);
+
+                if (node.Published)
+                {
+                    cs.SaveAndPublishWithStatus(node);
+                }
+                else
+                {
+                    cs.Save(node);
+                }
+
+                Log.Info("Finished converting node: " + node.Id);
+
+            }
+
+            return Content("Success");
+        }
+
+        private void IteriateThroughControlsInArea(ArchetypePropertyModel areaProperty, ArchetypePropertyModel areaControls, IEnumerable<Archetype.Models.ArchetypeFieldsetModel> alluEditAreas, CanvasControl cControl)
+        {
+
+            Log.Info("Area: " + areaProperty.Value);
+
+            var canvasArea = new CanvasArea();
+
+            canvasArea.Alias = areaProperty.Value.ToString();
+
+            var canvasControls = new List<CanvasControl>();
+
+            var controlsSet = JsonConvert.DeserializeObject<Canvas.Models.ArchetypeModel>(areaControls.Value.ToString());
+
+
+            if (controlsSet.Fieldsets.Where(x => !string.IsNullOrEmpty(x.Properties.Where(z => z.Alias == "type").FirstOrDefault().Value)).Any())
+            {
+
+                foreach (var controlFieldset in controlsSet.Fieldsets)
+                {
+
+                    if (controlFieldset.Properties.Where(x => x.Alias == "controlid").FirstOrDefault() != null && controlFieldset.Properties.Where(x => x.Alias == "type").FirstOrDefault() != null && !string.IsNullOrEmpty(controlFieldset.Properties.Where(x => x.Alias == "type").FirstOrDefault().Value))
+                    {
+
+                        var controlId = controlFieldset.Properties.Where(x => x.Alias == "controlid").FirstOrDefault();
+                        var controlType = controlFieldset.Properties.Where(x => x.Alias == "type").FirstOrDefault().Value;
+
+                        Log.Info("Control Type: " + controlType);
+
+                        var CanvasControl = new CanvasControl();
+
+                        var template = controlFieldset.Properties.Where(x => x.Alias == "template").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "template").FirstOrDefault().Value : null;
+
+                        if (template != null && !string.IsNullOrEmpty(template.ToString()))
+                        {
+
+                            template = template.ToString().Replace("\\Views\\Partials\\uEdit", "\\App_plugins\\Canvas\\Views").Replace("uEdit", "");
+                        }
+
+                        CanvasControl.Type = controlType.Replace("uEdit", "").Replace("Richtext", "RichText");
+                        CanvasControl.ControlID = new Guid(controlId.Value.ToString());
+                        CanvasControl.Class = controlFieldset.Properties.Where(x => x.Alias == "class").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "class").FirstOrDefault().Value : null;
+                        CanvasControl.Columns = controlFieldset.Properties.Where(x => x.Alias == "columns").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "columns").FirstOrDefault().Value : null;
+                        CanvasControl.Content = controlFieldset.Properties.Where(x => x.Alias == "content").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "content").FirstOrDefault().Value : null;
+                        CanvasControl.Description = controlFieldset.Properties.Where(x => x.Alias == "description").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "description").FirstOrDefault().Value : null;
+                        CanvasControl.Item = controlFieldset.Properties.Where(x => x.Alias == "item").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "item").FirstOrDefault().Value : null;
+                        CanvasControl.Macro = controlFieldset.Properties.Where(x => x.Alias == "macro").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "macro").FirstOrDefault().Value : null;
+                        CanvasControl.Template = template;
+                        CanvasControl.Title = controlFieldset.Properties.Where(x => x.Alias == "title").FirstOrDefault() != null ? controlFieldset.Properties.Where(x => x.Alias == "title").FirstOrDefault().Value : null;
+
+                        if (controlType == "uEditGrid" && controlFieldset.Properties.Where(x => x.Alias == "columns").FirstOrDefault() != null)
+                        {
+                            string _columns = controlFieldset.Properties.Where(x => x.Alias == "columns").FirstOrDefault().Value;
+
+                            string[] cols = _columns.Split(';');
+
+                            int c = 0;
+
+
+                            foreach (var col in cols)
+                            {
+
+                                var _col = col.Split(':');
+
+                                if (!string.IsNullOrEmpty(col) && _col.Length == 3)
+                                {
+
+
+                                    var colNumber = _col[0];
+                                    var screen = _col[1];
+                                    var config = _col[2];
+
+                                    string areaAlias = "grid-" + colNumber + "-" + controlId.Value + "-" + c;
+
+                                    Log.Info("Looking for Grid Area Alias: " + areaAlias);
+
+                                    var area = alluEditAreas.Where(x => x.Properties.Take(1).FirstOrDefault().Value.ToString() == areaAlias).First();
+
+                                    if (area != null)
+                                    {
+
+                                        Log.Info("Found Area: " + areaAlias);
+                                        var areaProperty2 = area.Properties.Take(1).FirstOrDefault();
+                                        var areaControls2 = area.Properties.Skip(1).Take(1).FirstOrDefault();
+
+                                        IteriateThroughControlsInArea(areaProperty2, areaControls2, alluEditAreas, CanvasControl);
+                                    }
+
+                                    c++;
+
+                                }
+
+                            }
+
+                            c = 0;
+
+
+                        }
+
+                        if (controlType == "uEditSection")
+                        {
+
+                            string areaAlias = "section-" + controlId.Value;
+
+                            Log.Info("Looking for  section alias: " + areaAlias);
+
+                            var area = alluEditAreas.Where(x => x.Properties.Take(1).FirstOrDefault().Value.ToString() == areaAlias).First();
+
+                            if (area != null)
+                            {
+
+                                Log.Info("Found Section area: " + areaAlias);
+
+                                var areaProperty2 = area.Properties.Take(1).FirstOrDefault();
+                                var areaControls2 = area.Properties.Skip(1).Take(1).FirstOrDefault();
+
+                                IteriateThroughControlsInArea(areaProperty2, areaControls2, alluEditAreas, CanvasControl);
+                            }
+                        }
+
+                        canvasControls.Add(CanvasControl);
+
+                        canvasArea.Controls = canvasControls;
+
+
+                    }
+
+                }
+            }
+
+            if (cControl != null)
+            {
+                cControl.Areas.Add(canvasArea);
+            }
+            else {
+                CanvasModel.Areas.Add(canvasArea);
             }
 
         }
