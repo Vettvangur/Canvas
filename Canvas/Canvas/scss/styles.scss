@@ -4,7 +4,7 @@
 
 // Global
 
-.canvas-bar * {
+.canvas-bar *,.canvas-footer *, .canvas-footer {
     box-sizing: border-box !important;
 }
 
@@ -78,6 +78,36 @@ body.canvas-body {
     overflow: auto;
 }
 
+// Canvas Footer
+.canvas-footer {
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:48px;
+    background-color: $canvas-darkBlue;
+    z-index: 2000000045;
+    color: #efefef;
+    line-height:48px;
+    font-family: sans-serif;
+    font-size: 16px;
+
+    a {
+         padding:0 15px;
+         color: #efefef;
+    }
+
+    .canvas-node-updated {
+        padding:0 15px;
+    }
+}
+
+.canvas-edit-mode {
+    .canvas-footer {
+        display:none;
+    }
+}
+
 // Canvas Bar
 .canvas-bar {
     position: fixed;
@@ -94,7 +124,7 @@ body.canvas-body {
         padding: 17px 20px;
         border-color: $canvas-lightBlue;
         height: 100%;
-        display: inline-block;
+        float: left;
         position: relative;
         color: #efefef;
         font-size: 20px;
@@ -133,6 +163,11 @@ body.canvas-body {
 
         &.canvas-item-logo {
             font-size: 28px;
+            padding: 0px 20px;
+
+            img {
+                margin-top:13px;
+            }
         }
     }
 
@@ -599,6 +634,7 @@ body.canvas-body {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 
     &.canvas-open {
         right: 0;
@@ -806,7 +842,7 @@ body.canvas-body {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-
+    box-sizing: border-box;
 
     &::-webkit-scrollbar {
         width: 5px;
@@ -977,6 +1013,7 @@ body.canvas-body {
     bottom: 0;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 
     &::-webkit-scrollbar {
         width: 5px;
@@ -1076,6 +1113,7 @@ body.canvas-body {
     left: -48px;
     top: 48px;
     z-index: 2000000000;
+    box-sizing: border-box;
 
     > a {
         width: 48px;
@@ -1325,11 +1363,11 @@ body.canvas-body {
 
 @font-face {
 	font-family: 'canvas';
-	src:url('/app_plugins/canvas/content/fonts/canvas.eot?-xic1n1');
-	src:url('/app_plugins/canvas/content/fonts/canvas.eot?-xic1n1#iefix') format('embedded-opentype'),
-		url('/app_plugins/canvas/content/fonts/canvas.ttf?-xic1n1') format('truetype'),
-		url('/app_plugins/canvas/content/fonts/canvas.woff?-xic1n1') format('woff'),
-		url('/app_plugins/canvas/content/fonts/canvas.svg?-xic1n1#canvas') format('svg');
+	src:url('../content/fonts/canvas.eot?-xic1n1');
+	src:url('../content/fonts/canvas.eot?-xic1n1#iefix') format('embedded-opentype'),
+		url('../content/fonts/canvas.ttf?-xic1n1') format('truetype'),
+		url('../content/fonts/canvas.woff?-xic1n1') format('woff'),
+		url('../content/fonts/canvas.svg?-xic1n1#canvas') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

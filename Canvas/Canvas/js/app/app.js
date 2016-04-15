@@ -15,7 +15,7 @@ var CanvasApp = function () {
         },
         apiUrl: '/umbraco/canvas/api',
         pageId: function () {
-            return $('input[name=canvas-pageId]').val();
+            return app.helpers.getQueryString("pageId").pageId;
         },
         version: function () {
             return $('input[name=canvas-version]').val();
@@ -91,7 +91,6 @@ var CanvasApp = function () {
         }
     };
 
-
     // Canvas Bar
     // -----------
     app.bar = {
@@ -123,10 +122,14 @@ var CanvasApp = function () {
             iframe.id = "canvas-iframe";
             iframe.width = '100%';
             iframe.onload = function () {
+
+                //$(iframe.contentDocument).find("body").append('<link rel="stylesheet" type="text/css" href="/umbraco/canvas/css/styles.min.css" />');
+                $(iframe.contentDocument).find("body").addClass('canvas-edit-mode');
                 app.areas.init(iframe.contentDocument);
                 app.control.init($(iframe.contentDocument));
 
                 app.helpers.loader.stop();
+
             };
 
             document.body.appendChild(iframe);
@@ -151,12 +154,12 @@ var CanvasApp = function () {
         render: function () {
             var $bar = $('<div><div class="canvas-bar"><div class="canvas-left"></div><div class="canvas-right"></div></div></div>');
 
-            $bar.find('.canvas-bar .canvas-left').append('<div class="canvas-item canvas-item-logo canvas-border-right"><a href="/umbraco#/content/content/edit/' + app.params.pageId() + '" target="_blank"><img src="/app_plugins/canvas/content/svg/vettvangur.svg" style=width:40px; height:20px;" alt="Vettvangur"/></a></div>');
+            $bar.find('.canvas-bar .canvas-left').append('<div class="canvas-item canvas-item-logo canvas-border-right"><a href="/umbraco#/content/content/edit/' + app.params.pageId() + '" target="_blank" title="Open page in Umbraco"><img src="/umbraco/assets/img/application/logo.png" style=width:32px; height:32px;" alt=""/></a></div>');
             $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-menu canvasicon-menu"></a>');
             $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-templates canvasicon-papers"></a>');
 
             $bar.find('.canvas-bar .canvas-right').append('<a href="#" class="canvas-item canvas-border-right canvas-item-settings canvasicon-cog"></a>');
-            $bar.find('.canvas-bar .canvas-right').append('<div class="canvas-options canvas-item canvas-border-right canvas-item-screens canvasicon-desktop"><ul class="canvas-screen-options"><li class="canvasicon-desktop canvas-selected"></li><li class="canvasicon-tablet-landscape"></li><li class="canvasicon-tablet"></li><li class="canvasicon-smartphone-landscape"></li><li class="canvasicon-smartphone"></li></ul></div>');
+            $bar.find('.canvas-bar .canvas-right').append('<div class="canvas-options canvas-item canvas-border-right canvas-item-screens canvasicon-desktop"><ul class="canvas-screen-options"><li class="canvasicon-desktop canvas-selected" title="Desktop"></li><li class="canvasicon-tablet-landscape" title="Tablet landscape"></li><li class="canvasicon-tablet" title="Tablet"></li><li class="canvasicon-smartphone-landscape" title="Phone landscape"></li><li class="canvasicon-smartphone" title="Phone"></li></ul></div>');
 
             $('body').append($bar.html());
         },
@@ -203,6 +206,8 @@ var CanvasApp = function () {
                 }
 
                 $('#canvas-iframe').attr('style', 'width:' + width);
+
+                app.bar.resizeIframe();
 
             });
 

@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Archetype, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Archetype.dll</HintPath>
+    <Reference Include="Archetype">
+      <HintPath>..\..\www.Reginn.is\Umbraco.Site\Umbraco.Site\bin\Archetype.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.dll</HintPath>
@@ -282,6 +281,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API.cs" />
+    <Compile Include="CanvasMenu.cs" />
     <Compile Include="Controllers\ApiController.cs" />
     <Compile Include="Helpers\Authorize.cs" />
     <Compile Include="Helpers\AuthorizeUserAttribute.cs" />

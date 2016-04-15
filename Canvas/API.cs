@@ -29,22 +29,41 @@ namespace Canvas
 
             var isAuthenticated = Authorize.isAuthenticated();
 
-            if (isAuthenticated && !HttpContext.Current.Request.Path.Contains(".aspx"))
-            {
+            //if (isAuthenticated && !HttpContext.Current.Request.Path.Contains(".aspx"))
+            //{
 
-                string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
-                string codemirrorCss = "<link href=\"/Umbraco/lib/codemirror/lib/codemirror.css\" type=\"text/css\" rel=\"stylesheet\">";
-                string pageId = "<input type=\"hidden\" name=\"canvas-pageId\" value=\"" + UmbracoContext.Current.PageId.ToString() + "\" />";
-                string builder = "<script src=\"/app_plugins/canvas/js/libs/builder.js\"></script>";
+            //    string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
+            //    string codemirrorCss = "<link href=\"/Umbraco/lib/codemirror/lib/codemirror.css\" type=\"text/css\" rel=\"stylesheet\">";
+            //    string pageId = "<input type=\"hidden\" name=\"canvas-pageId\" value=\"" + UmbracoContext.Current.PageId.ToString() + "\" />";
+            //    string builder = "<script src=\"/app_plugins/canvas/js/libs/builder.js\"></script>";
 
-                results = "<div class='canvas-settings'>" + css + codemirrorCss + pageId + builder + "</div>";
+            //    results = "<div class='canvas-settings'>" + css + codemirrorCss + pageId + builder + "</div>";
 
+            //}
+            //else if (isAuthenticated) {
+            //    string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
+
+            //    results = "<div class='canvas-settings'>" + css + "</div>";
+            //}
+
+            
+
+            if (isAuthenticated) {
+
+                var node = UmbracoContext.Current.PublishedContentRequest.PublishedContent;
+
+                bool hasCanvas = node.HasProperty("canvas");
+
+                string editInCanvas = "<span>Canvas not found on page.</span>";
+
+                if (hasCanvas) {
+                    editInCanvas = "<a href='/umbraco/canvas/?pageId=" + UmbracoContext.Current.PageId + "' class='canvas-edit-page' title='Edit this page in Canvas (" + UmbracoContext.Current.PageId + ")'>Edit Page</a>";
+                }
+
+                string css = "<link href=\"/umbraco/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
+                results = css + "<div class='canvas-footer'><div class='canvas-left'><a href='/umbraco/canvas/api/logoutofumbraco?url=" + node.Url + "' class='canvas-logout'>Logout</a><a href='/umbraco#/content/content/edit/" + UmbracoContext.Current.PageId + "' target='_blank'>Open in Umbraco</a></div><div class='canvas-right'><span class='canvas-node-updated'>Page last updated " + node.UpdateDate.ToString("d. MMM yyyy HH:mm") + " by " + node.WriterName + "</span>" + editInCanvas  + "</div></div>";
             }
-            else if (isAuthenticated) {
-                string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
 
-                results = "<div class='canvas-settings'>" + css + "</div>";
-            }
 
             return new HtmlString(results);
 
@@ -55,8 +74,13 @@ namespace Canvas
 
             try
             {
+                var isAuthenticated = Authorize.isAuthenticated();
 
-                var view = ViewHelper.Get(alias, Authorize.isAuthenticated());
+                if (!HttpContext.Current.Request.Path.Contains(".aspx")) {
+                    isAuthenticated = false;
+                }
+
+                var view = ViewHelper.Get(alias, isAuthenticated);
 
                 CultureInfo culture = CultureInfo.CreateSpecificCulture(UmbracoContext.Current.PublishedContentRequest.Culture.Name);
 

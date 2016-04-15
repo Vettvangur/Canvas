@@ -839,6 +839,12 @@ namespace Canvas.Controllers
             return Json(new { success = true });
         }
 
+        public ActionResult LogoutOfUmbraco(string url) {
+            UmbracoContext.Current.Security.ClearCurrentLogin();
+
+            return Redirect(url);
+        }
+
         private CanvasArea AreaResult = null;
 
         private void FindArea(CanvasArea area, string alias)
