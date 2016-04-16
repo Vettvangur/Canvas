@@ -1103,14 +1103,14 @@ var CanvasApp = function () {
                 } else if (contentType == 'Umbraco.TinyMCEv3') {
 
                     property = $('<div class="canvas-control-group">'
-                        + '<label for="' + alias + '">' + alias + '  <a href="#" class="canvas-content-edit-advanced" style="float:right;">Advanced</a></label>'
+                        + '<label for="' + alias + '">' + name + '  <a href="#" class="canvas-content-edit-advanced" style="float:right;">Advanced</a></label>'
                         + '<textarea class="canvas-editable" name="' + alias + '" id="canvas-editor-simple" rows="7">' + value + '</textarea>'
                         + '</div>');
 
                 } else if (contentType == 'Umbraco.MediaPicker' || contentType == 'media') {
 
                     property = $('<div class="canvas-control-group">'
-                        + '<label for="' + alias + '">' + alias + '</label>'
+                        + '<label for="' + alias + '">' + name + '</label>'
                         + '<input type="hidden" name="' + alias + '" id="' + alias + '" value="' + value + '" />'
                         + '<div class="canvas-image-wrapper" data-Id="' + value + '"><i class="canvas-icon canvas-icon-add"></i></div>'
                         + '</div>');

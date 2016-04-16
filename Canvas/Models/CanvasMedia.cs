@@ -24,7 +24,17 @@ namespace Canvas.Models
         {
             get
             {
-                return string.IsNullOrEmpty(src1) ? src2 : src1;
+                string s = string.IsNullOrEmpty(src1) ? src2 : src1;
+
+                if (!string.IsNullOrEmpty(s) && s.Contains("{")) {
+
+                    var json = JObject.Parse(s);
+
+                    s = (string)json["src"];
+
+                }
+
+                return s;
             }
 
         }
