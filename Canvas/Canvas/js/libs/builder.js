@@ -32,12 +32,12 @@ if (!window.jQuery) {
 
 function CanvasLoadDependencies() {
     $.when(
-        $.getScript("/app_plugins/canvas/js/libs/sortable.js"),
+        $.getScript("/umbraco/canvas/js/sortable.js"),
         $.getScript("/Umbraco/lib/tinymce/tinymce.min.js", function () {
             tinymce.dom.Event.domLoaded = true;
         }),
         $.getScript("/Umbraco/lib/codemirror/lib/codemirror.js"),
-        $.getScript("/app_plugins/canvas/js/dist/app.min.js"),
+        $.getScript("/umbraco/canvas/js/app.min.js"),
         $.Deferred(function (deferred) {
             $(deferred.resolve);
         })
