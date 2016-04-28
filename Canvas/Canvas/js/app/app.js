@@ -1774,6 +1774,7 @@ var CanvasApp = function () {
                             }
 
                             var content = editor.selection.getContent();
+
                             app.pickers.mediaPicker.init(editor, content);
 
                             var id = -1;
@@ -2191,7 +2192,7 @@ var CanvasApp = function () {
 
                     var img = me.find('img');
 
-                    if ($('.canvas-content-overlay').length > 0) {
+                    if (typeof editor !== 'undefined') {
 
                         var data = {
                             alt: '',
@@ -2207,7 +2208,7 @@ var CanvasApp = function () {
                             var imgElm = editor.dom.get('__mcenew');
                             var size = editor.dom.getSize(imgElm);
 
-                            var newSize = app.modules.media.scaleToMaxSize(800, size.w, size.h);
+                            var newSize = app.pickers.mediaPicker.scaleToMaxSize(800, size.w, size.h);
 
                             editor.dom.setAttrib(imgElm, 'id', null);
 
@@ -2218,7 +2219,6 @@ var CanvasApp = function () {
                         }, 500);
 
                     } else {
-
 
                         m.params.$container.find('.canvas-image-wrapper i,.canvas-image-wrapper img,.canvas-image-wrapper p').remove();
 
