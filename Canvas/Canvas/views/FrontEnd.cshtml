@@ -75,27 +75,13 @@
                                                     
     string columns = "";
     string row = "";    
-           
-    string mediaId = control.Item;
-    string imageUrl = "";
-                                                       
-    if (!String.IsNullOrEmpty(mediaId))
-    {
-        var media = Umbraco.TypedMedia(mediaId);
-
-        if (media != null)
-        {
-            imageUrl = media.Url;
-        }
-    }
-                                                                                                                                              
+                                                                                                                                                     
     if (!string.IsNullOrEmpty(templatePath))
     {
         var obj = new ViewDataDictionary();
 
         obj.Add("columns", cols);
         obj.Add("class", Class);
-        obj.Add("media", imageUrl);
 
         foreach (var col in cols)
         {
@@ -288,7 +274,7 @@
                                 
     IPublishedContent media = null;
 
-    if (!String.IsNullOrEmpty(mediaId))
+    if (!string.IsNullOrEmpty(mediaId))
     {
         media = Umbraco.TypedMedia(mediaId);
 
@@ -299,20 +285,26 @@
 
         string title = control.Title;
         string description = control.Description;
+        string mediaUrl = media.Url;
+
+        if (media.IsDocumentType("Image") && string.IsNullOrEmpty(templatePath))
+        {
+            mediaUrl = mediaUrl + "?width=1920&mode=max";
+        }
 
         if (!string.IsNullOrEmpty(templatePath))
         {
             var obj = new ViewDataDictionary();
 
             obj.Add("name", media.Name);
-            obj.Add("media", media.Url);
+            obj.Add("media", mediaUrl);
             obj.Add("title", title);
             obj.Add("description", description);
 
             @Html.Partial("~" + templatePath,Model.node,obj)
 
         } else {
-            <img src="@media.Url" alt="@title"/>
+            <img src="@mediaUrl" alt="@title"/>
         }
                                     
     }

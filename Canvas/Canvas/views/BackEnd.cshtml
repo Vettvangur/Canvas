@@ -93,87 +93,73 @@
 }
 
 @helper RenderGridControl(Canvas.Models.CanvasControl control, IContent page,string templatePath, CanvasModel model) {
+    
+    string _columns = control.Columns;
+    string Class = control.Class;
+                                                        
+    string[] cols = _columns.Split(';');
 
-string _columns = control.Columns;
-string Class = control.Class;
-
-string[] cols = _columns.Split(';');
-
-int c = 0;
-
-string columns = "";
-string row = "";
-
-string mediaId = control.Item;
-string imageUrl = "";
-
-if (!String.IsNullOrEmpty(mediaId))
-{
-    var media = Umbraco.TypedMedia(mediaId);
-
-    if (media != null)
+    int c = 0;
+                                                    
+    string columns = "";
+    string row = "";    
+                                                                                                                                                     
+    if (!string.IsNullOrEmpty(templatePath))
     {
-        imageUrl = media.Url;
-    }
-}
+        var obj = new ViewDataDictionary();
 
-if (!string.IsNullOrEmpty(templatePath))
-{
-    var obj = new ViewDataDictionary();
+        obj.Add("columns", cols);
+        obj.Add("class", Class);
 
-    obj.Add("columns", cols);
-    obj.Add("class", Class);
-    obj.Add("media", imageUrl);
-
-    foreach (var col in cols)
-    {
-
-        if (!string.IsNullOrEmpty(col))
+        foreach (var col in cols)
         {
 
-            var colNumber = col.Split(':')[0];
-            var screen = col.Split(':')[1];
-            var config = col.Split(':')[2];
+            if (!string.IsNullOrEmpty(col))
+            {
+                                                                                                                    
+                var colNumber = col.Split(':')[0];
+                var screen = col.Split(':')[1];
+                var config = col.Split(':')[2];
 
-            string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
 
-            obj.Add("column" + c, RenderControlsInArea(areaAlias,model,page));
+                obj.Add("column" + c, RenderControlsInArea(areaAlias,model,page));
 
-            c++;
+                c++;
+                                                                    
+            }
 
         }
 
-    }
+        row = Html.Partial("~" + templatePath,page,obj).ToString();
+        
+    } else {
 
-    row = Html.Partial("~" + templatePath,page,obj).ToString();
-
-} else {
-
-    foreach (var col in cols)
-    {
-
-        if (!string.IsNullOrEmpty(col))
+        foreach (var col in cols)
         {
 
-            var colNumber = col.Split(':')[0];
-            var screen = col.Split(':')[1];
-            var config = col.Split(':')[2];
+            if (!string.IsNullOrEmpty(col))
+            {
 
-            string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
+                var colNumber = col.Split(':')[0];
+                var screen = col.Split(':')[1];
+                var config = col.Split(':')[2];
 
-            columns += "<div class='column " + screen + "-" + colNumber + " " + config + "'>" +
-                RenderControlsInArea(areaAlias,model,page) +
-                "</div>";
+                string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
 
-            c++;
+                columns += "<div class='column " + screen + "-" + colNumber + " " + config + "'>" +
+                    RenderControlsInArea(areaAlias,model,page) +
+                    "</div>";
+
+                c++;
+
+            }
 
         }
-
+        
+        row = "<div class='row " + Class + "'>" + columns + "</div>";
     }
-
-    row = "<div class='row " + Class + "'>" + columns + "</div>";
-}
-
+                                
     @Html.Raw(HttpUtility.HtmlDecode(row))
     
 }
@@ -225,7 +211,7 @@ if (!string.IsNullOrEmpty(templatePath))
     string body = control.Content;
     string title = control.Title;
 
-    if (string.IsNullOrWhiteSpace(body) && string.IsNullOrWhiteSpace(title))
+    if (string.IsNullOrWhiteSpace(body))
     {
         body = "Write content here...";
     }
@@ -323,35 +309,41 @@ if (!string.IsNullOrEmpty(templatePath))
 
 @helper RenderMediaControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
 {
-    string mediaId = control.Item;
-                                
-    IPublishedContent media = null;
+string mediaId = control.Item;
 
-    if (!String.IsNullOrEmpty(mediaId))
+IPublishedContent media = null;
+
+if (!string.IsNullOrEmpty(mediaId))
+{
+    media = Umbraco.TypedMedia(mediaId);
+
+}
+
+if (media != null)
+{
+
+    string title = control.Title;
+    string description = control.Description;
+    string mediaUrl = media.Url;
+
+    if (media.IsDocumentType("Image") && string.IsNullOrEmpty(templatePath))
     {
-        media = Umbraco.TypedMedia(mediaId);
-
+        mediaUrl = mediaUrl + "?width=1920&mode=max";
     }
 
-    if (media != null)
+    if (!string.IsNullOrEmpty(templatePath))
     {
+        var obj = new ViewDataDictionary();
 
-        string title = control.Title;
-        string description = control.Description;
-
-        if (!string.IsNullOrEmpty(templatePath))
-        {
-            var obj = new ViewDataDictionary();
-
-            obj.Add("name", media.Name);
-            obj.Add("media", media.Url);
-            obj.Add("title", title);
-            obj.Add("description", description);
+        obj.Add("name", media.Name);
+        obj.Add("media",mediaUrl);
+        obj.Add("title", title);
+        obj.Add("description", description);
 
             @Html.Partial("~" + templatePath,page, obj)
 
         } else {
-            <img src="@media.Url" alt="@title"/>
+            <img src="@mediaUrl" alt="@title"/>
         }
                                     
     } else {

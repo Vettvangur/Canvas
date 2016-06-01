@@ -460,6 +460,7 @@ body.canvas-body {
         top: 5px;
         display: none;
         z-index: 2000000000;
+        width:90px;
 
         > a {
             display: block;
@@ -534,6 +535,10 @@ body.canvas-body {
             display: block;
         }
     }
+}
+
+.canvas-control[data-controltype=Section] > .canvas-control-actions {
+    top: -23px;
 }
 
 .canvas-control[data-controltype=Grid] > .canvas-control-actions {
