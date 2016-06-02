@@ -274,7 +274,7 @@
                                 
     IPublishedContent media = null;
 
-    if (!string.IsNullOrEmpty(mediaId))
+    if (!String.IsNullOrEmpty(mediaId))
     {
         media = Umbraco.TypedMedia(mediaId);
 
@@ -287,8 +287,7 @@
         string description = control.Description;
         string mediaUrl = media.Url;
 
-        if (media.IsDocumentType("Image") && string.IsNullOrEmpty(templatePath))
-        {
+        if (media.IsDocumentType("Image") && string.IsNullOrEmpty(templatePath)) {
             mediaUrl = mediaUrl + "?width=1920&mode=max";
         }
 
