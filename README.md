@@ -15,8 +15,9 @@ Install through Umbraco CMS. Read more here : https://our.umbraco.org/wiki/how-t
 
 ### Usage ###
 
-1. Insert @Canvas.API.Init() before </body> tag in Masterpage or inside any view.
-2. Insert @Canvas.API.Render("alias", this.Html) anywhere inside a template to make that area editable for Canvas. "Alias" can be anything you want.
-3. Log in as Adminstrator or a user in a group named "Canvas". If you look at the page now you should see the Canvas Edit Bar at the bottom of the page.
+1. Create property named "Canvas" with the alias "canvas" as a textarea to store the canvas json data.
+2. Insert @Canvas.API.Init() before </body> tag in Masterpage or inside any view.
+3. Insert @Canvas.API.Render("alias", this.Html) anywhere inside a template to make that area editable for Canvas. "Alias" can be anything you want.
+4. Log in as Adminstrator or a user in a group named "Canvas". If you look at the page now you should see the Canvas Edit Bar at the bottom of the page.
 
 
