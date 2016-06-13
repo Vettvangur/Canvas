@@ -29,25 +29,6 @@ namespace Canvas
 
             var isAuthenticated = Authorize.isAuthenticated();
 
-            //if (isAuthenticated && !HttpContext.Current.Request.Path.Contains(".aspx"))
-            //{
-
-            //    string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
-            //    string codemirrorCss = "<link href=\"/Umbraco/lib/codemirror/lib/codemirror.css\" type=\"text/css\" rel=\"stylesheet\">";
-            //    string pageId = "<input type=\"hidden\" name=\"canvas-pageId\" value=\"" + UmbracoContext.Current.PageId.ToString() + "\" />";
-            //    string builder = "<script src=\"/app_plugins/canvas/js/libs/builder.js\"></script>";
-
-            //    results = "<div class='canvas-settings'>" + css + codemirrorCss + pageId + builder + "</div>";
-
-            //}
-            //else if (isAuthenticated) {
-            //    string css = "<link href=\"/app_plugins/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
-
-            //    results = "<div class='canvas-settings'>" + css + "</div>";
-            //}
-
-            
-
             if (isAuthenticated) {
 
                 var node = UmbracoContext.Current.PublishedContentRequest.PublishedContent;
@@ -61,7 +42,14 @@ namespace Canvas
                 }
 
                 string css = "<link href=\"/umbraco/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
-                results = css + "<div class='canvas-footer'><div class='canvas-left'><a href='/umbraco/canvas/api/logoutofumbraco?url=" + node.Url + "' class='canvas-logout'>Logout</a><a href='/umbraco#/content/content/edit/" + UmbracoContext.Current.PageId + "' target='_blank'>Open in Umbraco</a></div><div class='canvas-right'><span class='canvas-node-updated'>Page last updated " + node.UpdateDate.ToString("d. MMM yyyy HH:mm") + " by " + node.WriterName + "</span>" + editInCanvas  + "</div></div>";
+                results = css + "<div class='canvas-footer'><div class='canvas-left'>" +
+                    "<a href='/umbraco/canvas/api/logoutofumbraco?url=" + node.Url + "' class='canvas-logout'>Logout</a>" +
+                    "<a href='/umbraco#/content/content/edit/" + UmbracoContext.Current.PageId + "' target='_blank'>Open in Umbraco</a>" +
+                    "</div>" +
+                    "<div class='canvas-right'>" +
+                        "<span class='canvas-node-updated'>Page last updated " + node.UpdateDate.ToString("d. MMM yyyy HH:mm") + " by " + node.WriterName + "</span>" +
+                        editInCanvas  +
+                    "</div></div>";
             }
 
 

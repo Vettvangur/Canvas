@@ -296,7 +296,6 @@
     <Compile Include="Models\CanvasParents.cs" />
     <Compile Include="Models\CanvasTemplate.cs" />
     <Compile Include="Models\CanvasView.cs" />
-    <Compile Include="Models\uEditArchetypeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -314,6 +313,7 @@
     <Content Include="Canvas\content\svg\vettvangur.svg" />
     <Content Include="Canvas\css\styles.css" />
     <Content Include="Canvas\css\styles.min.css" />
+    <Content Include="Canvas\index.html" />
     <Content Include="Canvas\js\app\app.js" />
     <Content Include="Canvas\js\dist\app.js" />
     <Content Include="Canvas\js\dist\app.min.js" />
