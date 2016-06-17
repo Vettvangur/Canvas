@@ -1,8 +1,3 @@
-/**
- * Umbraco Canvas Live Editor 1.0
- * @copyright Vettvangur ehf. Garðar Þorsteinsson (c) 2015
- */
-
 var CanvasApp = function () {
 
     var app = {};
