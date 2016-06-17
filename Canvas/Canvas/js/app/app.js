@@ -2,7 +2,6 @@
 
     var app = {};
 
-    // App Parameters
     // -----------
     app.params = {
         $body: function() {
