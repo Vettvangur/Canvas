@@ -1,7 +1,7 @@
-Canvas - Umbraco editor
+Canvas - Live Content editor for Umbraco
 =========
 
-## Installation
+**1st Price in the package competition at Codegarden 16.**
 
 ### Package install ###
 Download newest release from https://github.com/vettvangur/Canvas/releases.
@@ -29,7 +29,7 @@ Install through Umbraco CMS. Read more here : https://our.umbraco.org/wiki/how-t
 5. Easy customization to use any framework like Bootstrap or Foundation. It used Foundation by default.
 6. Can use multiple content picker, single content picker, media picker and more on macros.
 
-### Roadmap ###
+### Coming soon ###
 
 1. Copy,Cut Controls.
 2. Save all content on page as template that you can paste into a new page for quicker content management.
@@ -37,3 +37,4 @@ Install through Umbraco CMS. Read more here : https://our.umbraco.org/wiki/how-t
 4. Documentation
 5. Refactoring code
 6. Only allow edit if user has access to page
+7. UI update
