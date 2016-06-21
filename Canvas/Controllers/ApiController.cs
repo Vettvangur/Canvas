@@ -13,7 +13,6 @@ using Canvas.Models;
 using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Web;
-using Archetype.Models;
 using System.Web.Script.Serialization;
 
 namespace Canvas.Controllers
