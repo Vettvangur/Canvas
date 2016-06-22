@@ -1,0 +1,10 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<dynamic>
+
+@{
+    string description = (string)ViewData["description"];    
+}
+
+<img src="@ViewData["media"]" alt="@ViewData["title"]" class="@ViewData["class"]"/>
+  @if (!string.IsNullOrEmpty(description)) { 
+  <p>@ViewData["description"]</p>
+}

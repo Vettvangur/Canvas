@@ -1,0 +1,43 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<dynamic>
+  
+  @{
+    string[] columns = (string[])ViewData["columns"];
+
+    int c = 0;   
+  }
+
+
+  <div class="row @ViewData["class"]">
+
+    @foreach (var col in columns)
+    {
+        
+        if (!string.IsNullOrEmpty(col))
+        {
+
+            var colNumber = col.Split(':')[0];
+            var screen = col.Split(':')[1];
+    
+    		if (screen == "medium") {
+    			screen = "md";
+    		}
+      		if (screen == "small") {
+    			screen = "sm";
+    		}
+      		if (screen == "large") {
+    			screen = "lg";
+    		}
+    
+            var config = col.Split(':')[2];
+
+            <div class="col-@screen-@colNumber @config">
+                @ViewData["column" + c]
+            </div>
+
+            c++;
+
+        }
+
+    } 
+  </div>
+

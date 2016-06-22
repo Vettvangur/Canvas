@@ -1,0 +1,10 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<dynamic>
+
+@{
+    string alias = (string)ViewData["alias"];
+    var parameters = (ViewDataDictionary)ViewData["parameters"];
+}
+
+<div class="macro-wrapper">
+    @Umbraco.RenderMacro(alias, parameters)
+</div>
