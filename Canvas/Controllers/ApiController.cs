@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Web;
 using System.Web.Script.Serialization;
+using umbraco.cms.helpers;
 
 namespace Canvas.Controllers
 {
@@ -664,9 +665,9 @@ namespace Canvas.Controllers
         [ValidateInput(false)]
         public JsonResult CreateTemplate(string name, string content, string controlType)
         {
-            if (!System.IO.File.Exists(Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + controlType + "/" + name + ".cshtml")))
+            if (!System.IO.File.Exists(Server.MapPath("/Views/Canvas/Templates/" + controlType + "/" + name + ".cshtml")))
             {
-                System.IO.File.WriteAllText(Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + controlType + "/" + name + ".cshtml"), content, Encoding.UTF8);
+                System.IO.File.WriteAllText(Server.MapPath("/Views/Canvas/Templates/" + controlType + "/" + name + ".cshtml"), content, Encoding.UTF8);
 
                 var templates = CanvasHelper.GetTemplates(controlType);
 
@@ -683,9 +684,9 @@ namespace Canvas.Controllers
         [ValidateInput(false)]
         public JsonResult SaveTemplate(string name, string content, string controlType)
         {
-            if (System.IO.File.Exists(Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + controlType + "/" + name + ".cshtml")))
+            if (System.IO.File.Exists(Server.MapPath("/Views/Canvas/Templates/" + controlType + "/" + name + ".cshtml")))
             {
-                System.IO.File.WriteAllText(Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + controlType + "/" + name + ".cshtml"), content, Encoding.UTF8);
+                System.IO.File.WriteAllText(Server.MapPath("/Views/Canvas/Templates/" + controlType + "/" + name + ".cshtml"), content, Encoding.UTF8);
 
                 var templates = CanvasHelper.GetTemplates(controlType);
 
@@ -815,9 +816,9 @@ namespace Canvas.Controllers
 
             cs.Save(page);
 
-            var tmp = Umbraco.RenderTemplate(page.Id);
+            //var tmp = Umbraco.RenderTemplate(page.Id);
 
-            return Json(new { success = true, html = tmp.ToString() });
+            return Json(new { success = true });
         }
 
         [HttpPost]

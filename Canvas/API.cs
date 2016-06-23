@@ -38,7 +38,7 @@ namespace Canvas
                 string editInCanvas = "<span>Canvas not found on page.</span>";
 
                 if (hasCanvas) {
-                    editInCanvas = "<a href='/umbraco/canvas/?pageId=" + UmbracoContext.Current.PageId + "' class='canvas-edit-page' title='Edit this page in Canvas (" + UmbracoContext.Current.PageId + ")'>Edit Page</a>";
+                    editInCanvas = "<a href='/umbraco/canvas/?pageId=" + UmbracoContext.Current.PageId + "&url=" + node.Url + "' class='canvas-edit-page' title='Edit this page in Canvas (" + UmbracoContext.Current.PageId + ")'>Edit</a>";
                 }
 
                 string css = "<link href=\"/umbraco/canvas/css/styles.min.css\" type=\"text/css\" rel=\"stylesheet\">";
@@ -62,33 +62,25 @@ namespace Canvas
 
             try
             {
-                var isAuthenticated = Authorize.isAuthenticated();
+                // If request is coming from frontend then always show frontend content, check authentication if it comes from backend (.aspx)
 
-                if (!HttpContext.Current.Request.Path.Contains(".aspx")) {
-                    isAuthenticated = false;
+                var isAuthenticated = false;
+
+                if (HttpContext.Current.Request.Path.Contains(".aspx"))
+                {
+                    isAuthenticated = Authorize.isAuthenticated();
                 }
 
                 var view = ViewHelper.Get(alias, isAuthenticated);
 
-                CultureInfo culture = CultureInfo.CreateSpecificCulture(UmbracoContext.Current.PublishedContentRequest.Culture.Name);
+                var culture = CultureInfo.CreateSpecificCulture(UmbracoContext.Current.PublishedContentRequest.Culture.Name);
 
                 Thread.CurrentThread.CurrentCulture = culture;
                 Thread.CurrentThread.CurrentUICulture = culture;
 
-                if (view != null)
-                {
+                var model = helper.Partial(view.viewName, view);
 
-                    var model = helper.Partial(view.viewName, view);
-
-                    return new HtmlString(model.ToString());
-
-                }
-                else
-                {
-
-                    return new HtmlString("");
-
-                }
+                return new HtmlString(model.ToString());
 
             }
             catch (Exception ex)

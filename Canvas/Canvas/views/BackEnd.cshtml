@@ -9,7 +9,6 @@
     @RenderControlsInArea(Model.alias, model, Model.page)
 }
 
-
 @helper RenderControlsInArea(string alias, CanvasModel model, IContent page)
 {
     
@@ -24,19 +23,25 @@
 
                 foreach (var control in area.Controls)
                 {
-                        
+
                     string templatePath = string.Empty;
-                        
+
                     if (!string.IsNullOrEmpty(control.Template)) {
-                            
+
+                        // For Backward compatability with older versions of Canvas
+                        if (control.Template.ToLower().Contains("app_plugins"))
+                        {
+                            control.Template = "/Views/Canvas/" + control.Template.Replace("\\App_plugins\\Canvas\\Views\\","");
+                        }
+
                         if (System.IO.File.Exists(Server.MapPath(control.Template)))
                         {
                             templatePath = control.Template;
                         }
-                             
+
                     }
-                        
-                    <div class="canvas-control" data-controlId="@control.ControlID" data-controlType="@control.Type">
+
+                    <div class="canvas-control" data-controlId="@control.ControlID" data-controlType="@control.Type" data-path="@control.Template">
 
                         <div class="canvas-control-actions">
                             <a href="#" class="canvas-action-edit">Edit</a>

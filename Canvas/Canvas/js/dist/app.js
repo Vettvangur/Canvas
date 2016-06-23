@@ -2,7 +2,6 @@ var CanvasApp = function () {
 
     var app = {};
 
-    // App Parameters
     // -----------
     app.params = {
         $body: function() {
@@ -12,8 +11,8 @@ var CanvasApp = function () {
         pageId: function () {
             return app.helpers.getQueryString("pageId").pageId;
         },
-        version: function () {
-            return $('input[name=canvas-version]').val();
+        pageUrl: function () {
+            return app.helpers.getQueryString("url").url;
         },
         getIframeContent: function() {
             var iframe = document.getElementById('canvas-iframe');
@@ -124,14 +123,12 @@ var CanvasApp = function () {
                 app.control.init($(iframe.contentDocument));
 
                 app.helpers.loader.stop();
-
+                me.resizeIframe();
             };
 
             document.body.appendChild(iframe);
 
             $('body').addClass('canvas-body');
-                
-            me.resizeIframe();
 
             $(window).resize(function () {
                 me.resizeIframe();
@@ -140,10 +137,14 @@ var CanvasApp = function () {
 
         },
 
-        resizeIframe: function() {
-            var height = $(window).height();
+        resizeIframe: function () {
 
-            $('#canvas-iframe').css('height', height - 60);
+            var height = $(window).height();
+            var offset = $('.canvas-bar').outerHeight() + $('.canvas-footer').outerHeight();
+
+            console.log(height);
+
+            $('#canvas-iframe').css('height', (height - offset));
         },
 
         render: function () {
@@ -151,7 +152,7 @@ var CanvasApp = function () {
 
             $bar.find('.canvas-bar .canvas-left').append('<div class="canvas-item canvas-item-logo canvas-border-right"><a href="/umbraco#/content/content/edit/' + app.params.pageId() + '" target="_blank" title="Open page in Umbraco"><img src="/umbraco/assets/img/application/logo.png" style=width:32px; height:32px;" alt=""/></a></div>');
             $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-menu canvasicon-menu"></a>');
-            $bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-templates canvasicon-papers"></a>');
+            //$bar.find('.canvas-bar .canvas-left').append('<a href="#" class="canvas-item canvas-border-right canvas-item-templates canvasicon-papers"></a>');
 
             $bar.find('.canvas-bar .canvas-right').append('<a href="#" class="canvas-item canvas-border-right canvas-item-settings canvasicon-cog"></a>');
             $bar.find('.canvas-bar .canvas-right').append('<div class="canvas-options canvas-item canvas-border-right canvas-item-screens canvasicon-desktop"><ul class="canvas-screen-options"><li class="canvasicon-desktop canvas-selected" title="Desktop"></li><li class="canvasicon-tablet-landscape" title="Tablet landscape"></li><li class="canvasicon-tablet" title="Tablet"></li><li class="canvasicon-smartphone-landscape" title="Phone landscape"></li><li class="canvasicon-smartphone" title="Phone"></li></ul></div>');
@@ -215,6 +216,30 @@ var CanvasApp = function () {
                 $('.canvas-menu').toggleClass('canvas-open');
 
             });
+        }
+    };
+
+    // Canvas Footer
+    // -----------
+    app.footer = {
+        init: function() {
+            var me = this;
+
+            me.render();
+        },
+
+        render: function () {
+
+            if ($('.canvas-footer').length <= 0) {
+
+                var $content = $('<div class="canvas-footer"><div class="canvas-left"></div><div class="canvas-right"></div></div>');
+
+                $content.find('.canvas-left').append("<a href='/umbraco/canvas/api/LogoutOfUmbraco?url=" + app.params.pageUrl() + "' class='canvas-logout'>Logout</a><a href='/umbraco#/content/content/edit/" + app.params.pageId() + "' target='_blank'>Open in Umbraco</a>");
+                $content.find('.canvas-right').append("<a href='" + app.params.pageUrl() + "'>Exit edit mode</a>");
+
+                $('body').append($content);
+            }
+
         }
     };
 
@@ -1127,7 +1152,7 @@ var CanvasApp = function () {
 
                                     var thumbSrc = src.replace('.' + thumbSplit[thumbSplit.length - 1], '_thumb.' + thumbSplit[thumbSplit.length - 1]);
 
-                                    var thumbPath = app.params.version() == '6' ? thumbSrc : '/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=' + json.src;
+                                    var thumbPath = '/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=' + json.src;
 
                                     var img = '<img src="' + thumbPath + '" alt="' + json.name + '" title="' + json.name + '"/>';
 
@@ -2297,7 +2322,7 @@ var CanvasApp = function () {
 
                                 var thumbSrc = src.replace('.' + thumbSplit[thumbSplit.length - 1], '_thumb.' + thumbSplit[thumbSplit.length - 1]);
 
-                                var thumbPath = app.params.version() == '6' ? thumbSrc : '/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=' + v.src;
+                                var thumbPath = '/umbraco/backoffice/UmbracoApi/Images/GetBigThumbnail?originalImagePath=' + v.src;
 
                                 item = '<div class="canvas-media-image canvas-media-item" data-Id="' + v.id + '"><img src="' + thumbPath + '" alt="' + v.text + '" title="' + v.text + '" data-src="' + v.src + '"/></div>';
                             }
@@ -2434,7 +2459,7 @@ var CanvasApp = function () {
 
             if ($('.canvas-item-publish').length <= 0) {
 
-                $('.canvas-bar .canvas-right').append('<a href="#" class="canvas-item canvas-border-left canvas-item-cancel canvasicon-cross2"></a><a href="#" class="canvas-item canvas-border-left canvas-item-publish canvasicon-floppy-disk"></a>');
+                $('.canvas-bar .canvas-right').append('<a href="#" class="canvas-item canvas-border-left canvas-item-cancel canvasicon-cross"></a><a href="#" class="canvas-item canvas-border-left canvas-item-publish canvasicon-floppy-disk"></a>');
 
                 $('body').on('click', '.canvas-item-publish', function (e) {
                     e.preventDefault();
@@ -2450,13 +2475,17 @@ var CanvasApp = function () {
                         url: app.params.apiUrl + '/PublishPage?pageId=' + app.params.pageId(),
                         success: function (json) {
 
-                            me.removeAttr('disabled');
+                            // Some issue with cache not rebuilding after publish unless the page has reloaded.
 
-                            app.helpers.loader.stop();
+                            window.location.reload();
 
-                            $('.canvas-item-cancel, .canvas-item-publish').fadeOut(function () {
-                                $(this).remove();
-                            });
+                            //me.removeAttr('disabled');
+
+                            //app.helpers.loader.stop();
+
+                            //$('.canvas-item-cancel, .canvas-item-publish').fadeOut(function () {
+                            //    $(this).remove();
+                            //});
                         }
                     });
 
@@ -2524,10 +2553,9 @@ var CanvasApp = function () {
         },
 
         resizeWindow: function ($w) {
-            var height = 0;
-            var windowHeight = $(window).height();
+            var windowHeight = $(window).outerHeight();
 
-            $w.css('height', windowHeight - 60);
+            $w.css('height', (windowHeight - 108));
         },
 
         escapeHtml: {
@@ -2573,10 +2601,11 @@ var CanvasApp = function () {
     app.initialize = (function () {
 
         app.bar.init();
+        app.footer.init();
         app.pickers.init();
         app.modules.init();
         app.helpers.init();
-        $('body').append('<div class="canvas-window"></div>')
+        $('body').append('<div class="canvas-window"></div>');
         
         // globalize scope
         CanvasApp = app;

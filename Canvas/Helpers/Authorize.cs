@@ -28,7 +28,6 @@ namespace Canvas.Helpers
 
                 var validate = false;
 
-
                 var cu = GetCurrentUser();
 
                 if (cu != null)

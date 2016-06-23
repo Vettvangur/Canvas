@@ -303,6 +303,14 @@
     <None Include="Canvas\scss\styles.scss" />
     <None Include="Canvas\views\BackEnd.cshtml" />
     <None Include="Canvas\views\FrontEnd.cshtml" />
+    <None Include="Canvas\views\Samples\Button\Button.cshtml" />
+    <None Include="Canvas\views\Samples\Grid\Bootstrap - Grid.cshtml" />
+    <None Include="Canvas\views\Samples\Heading\Page Heading.cshtml" />
+    <None Include="Canvas\views\Samples\Macro\MacroWrapper.cshtml" />
+    <None Include="Canvas\views\Samples\Media\Image.cshtml" />
+    <None Include="Canvas\views\Samples\RichText\RichText.cshtml" />
+    <None Include="Canvas\views\Samples\Section\Boostrap - Container.cshtml" />
+    <None Include="Canvas\views\Samples\Text\Bloquote .cshtml" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -316,6 +324,15 @@
     <Content Include="Canvas\js\dist\app.min.js" />
     <Content Include="Canvas\js\libs\builder.js" />
     <Content Include="Canvas\js\libs\sortable.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Canvas\views\Templates\Grid\" />
+    <Folder Include="Canvas\views\Templates\Heading\" />
+    <Folder Include="Canvas\views\Templates\Macro\" />
+    <Folder Include="Canvas\views\Templates\Media\" />
+    <Folder Include="Canvas\views\Templates\RichText\" />
+    <Folder Include="Canvas\views\Templates\Section\" />
+    <Folder Include="Canvas\views\Templates\Text\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />

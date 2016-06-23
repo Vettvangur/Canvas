@@ -24,17 +24,17 @@ namespace Canvas.Helpers
         {
             List<CanvasTemplate> templates = new List<CanvasTemplate>();
 
-            if (!Directory.Exists(HttpContext.Current.Server.MapPath("/App_Plugins/Canvas/Views/Templates")))
+            if (!Directory.Exists(HttpContext.Current.Server.MapPath("/Views/Canvas/Templates")))
             {
-                Directory.CreateDirectory(HttpContext.Current.Server.MapPath("/App_Plugins/Canvas/Views/Templates"));
+                Directory.CreateDirectory(HttpContext.Current.Server.MapPath("/Views/Canvas/Templates"));
             }
 
-            if (!Directory.Exists(HttpContext.Current.Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + type)))
+            if (!Directory.Exists(HttpContext.Current.Server.MapPath("/Views/Canvas/Templates/" + type)))
             {
-                Directory.CreateDirectory(HttpContext.Current.Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + type));
+                Directory.CreateDirectory(HttpContext.Current.Server.MapPath("/Views/Canvas/Templates/" + type));
             }
 
-            DirectoryInfo templateFolder = new DirectoryInfo(HttpContext.Current.Server.MapPath("/App_Plugins/Canvas/Views/Templates/" + type));
+            DirectoryInfo templateFolder = new DirectoryInfo(HttpContext.Current.Server.MapPath("/Views/Canvas/Templates/" + type));
 
             FileInfo[] templateViews = templateFolder.GetFiles();
 
@@ -46,7 +46,7 @@ namespace Canvas.Helpers
                 var m = new CanvasTemplate();
 
                 m.name = template.Name.Replace(".cshtml", "");
-                m.path = "\\App_plugins\\Canvas" + template.FullName.Substring(index, template.FullName.Length - index);
+                m.path = template.FullName.Substring(index, template.FullName.Length - index);
 
                 templates.Add(m);
             }

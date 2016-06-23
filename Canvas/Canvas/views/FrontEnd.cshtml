@@ -24,7 +24,13 @@
             string templatePath = string.Empty;
                         
             if (!string.IsNullOrEmpty(control.Template)) {
-                            
+                    
+                // For Backward compatability with older versions of Canvas
+                if (control.Template.ToLower().Contains("app_plugins"))
+                {
+                    control.Template = "/Views/Canvas/" + control.Template.Replace("\\App_plugins\\Canvas\\Views\\","");
+                }
+                        
                 if (System.IO.File.Exists(Server.MapPath(control.Template)))
                 {
                     templatePath = control.Template;

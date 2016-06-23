@@ -37,13 +37,13 @@ namespace Canvas.Helpers
 
                     var model = Repository.GetObjectById(pageId);
 
-                    // Finna Area hvort sem það sé inn í Grid/section eða rótar svæði
+                    // Find area recurcivly
 
-                    if (!model.Areas.Where(x => x.Alias == alias).Any())
+                    if (model.Areas.All(x => x.Alias != alias))
                     {
-                        // Fann ekki area og bý það því til
+                        // Did not find area
 
-                        // Athuga hvort það séu til einhver rótar svæði nú þegar, ef svo er þá bæta þeim við en annars búa til alveg nýtt
+                        // Check if there is a root area, create it if not.
 
                         Log.Info("Canvas - Did not find area, try to create it: " + alias);
 
@@ -53,7 +53,7 @@ namespace Canvas.Helpers
 
                         if (model.Areas.Any())
                         {
-                            // Bæta við 
+                            // Append new
 
                             model.Areas.Add(area);
 
@@ -63,7 +63,7 @@ namespace Canvas.Helpers
                         }
                         else
                         {
-                            // Búa til ný
+                            // Create new
 
                             var areaModel = new CanvasModel();
 
@@ -77,18 +77,18 @@ namespace Canvas.Helpers
                     }
 
                     View.page = page;
-                    View.viewName = "/App_Plugins/Canvas/Views/Backend.cshtml";
+                    View.viewName = "/Views/Canvas/Backend.cshtml";
 
                 }
                 else
                 {
-
                     View.node = UmbracoContext.Current.ContentCache.GetById(pageId);
-                    View.viewName = "/App_Plugins/Canvas/Views/FrontEnd.cshtml";
+                    View.viewName = "/Views/Canvas/FrontEnd.cshtml";
 
                 }
 
                 View.alias = alias;
+
                 return View;
             }
             catch (Exception ex)
