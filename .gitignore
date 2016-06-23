@@ -100,4 +100,6 @@ node_modules
 npm-debug.log
 css
 
+**/dist/
+
 
