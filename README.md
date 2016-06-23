@@ -11,7 +11,7 @@ Install through Umbraco CMS. Read more here : https://our.umbraco.org/wiki/how-t
 1. Move Canvas.dll to bin folder.
 2. Create folder inside /Umbraco with the name "Canvas". Move Index.html file, Css folder and Content folder inside it.
 3. Create folder inside Canvas with the name "js".  Move app.min.js, builder.js and sortable.js inside it.
-4. Create folder inside /App_Plugins with the name "Canvas". Move Views folder inside it. Update web.config file with "/Views/Web.config" file.
+4. Create folder inside /Views with the name "Canvas". Move Content of Views folder inside it.
 
 ### Set up ###
 
