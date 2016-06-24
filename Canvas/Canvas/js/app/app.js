@@ -142,8 +142,6 @@
             var height = $(window).height();
             var offset = $('.canvas-bar').outerHeight() + $('.canvas-footer').outerHeight();
 
-            console.log(height);
-
             $('#canvas-iframe').css('height', (height - offset));
         },
 
@@ -808,7 +806,12 @@
                             $property = $('<div class="canvas-control-group canvas-clearfix">'
                                 + '<label for="' + propertyName + '">' + propertyName + ' <a href="#" class="canvas-template-new" style="float:right; margin-left:10px;">New</a> <a href="#" class="canvas-template-edit" style="float:right; margin-left:10px;">Edit</a></label>'
                                 + '<select name="' + propertyName + '" id="' + propertyName + '"><option value="">Select template</option></select>'
-                                + '</div>')
+                                + '</div>');
+
+                            // For Backward compatability with older versions of Canvas
+                            if (propertyValue.toLowerCase().indexOf("app_plugins") > -1) {
+                                propertyValue = "\\Views\\Canvas\\" + propertyValue.replace("\\App_plugins\\Canvas\\Views\\", "");
+                            }
 
                             $(json.templates).each(function (i) {
 
