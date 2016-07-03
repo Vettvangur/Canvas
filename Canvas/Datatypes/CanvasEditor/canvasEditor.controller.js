@@ -8,6 +8,8 @@
     $scope.idle = false;
     $scope.nodeId = $routeParams.id;
     $scope.url = '/';
+    $scope.host = '';
+    $scope.pathname = '/';
 
     getContent();
 
@@ -199,7 +201,16 @@
                 $scope.latestValue = canvasValue;
 
                 if (content.urls.length > 0) {
-                    $scope.url = content.urls[0];
+
+                    var href = content.urls[0];
+
+                    var l = document.createElement("a");
+
+                    l.href = href;
+
+                    $scope.url = href;
+                    $scope.host = l.origin;
+                    $scope.pathname = l.pathname;
                 }
 
             });
