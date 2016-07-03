@@ -7,6 +7,7 @@ var jsFiles = [
 ];
 
 var css_destPath = 'canvas/css';
+var datatype_destPath = 'datatypes/canvaseditor';
 var js_destPath = 'canvas/js/dist';
 
 gulp.task('sass', function () {
@@ -26,6 +27,21 @@ gulp.task('sass', function () {
       .pipe(gulp.dest(css_destPath));
 });
 
+gulp.task('sassDataType', function () {
+    return gulp.src('canvas/scss/canvaseditor.scss')
+      .pipe($.sass({
+          errLogToConsole: true
+      })
+        .on('error', $.sass.logError))
+      .pipe($.autoprefixer({
+          browsers: ['> 1%', 'last 2 versions', 'ie >= 9']
+      }))
+      .pipe(minifyCss({
+          keepSpecialComments: 0
+      }))
+      .pipe(gulp.dest(datatype_destPath));
+});
+
 gulp.task('js', function () {
     return gulp.src(jsFiles)
         .pipe($.concat('app.js'))
@@ -36,10 +52,11 @@ gulp.task('js', function () {
 });
 
 
-gulp.task('default', ['sass', 'js']);
+gulp.task('default', ['sass','sassDataType', 'js']);
 
 gulp.task('watch', function () {
     gulp.watch(['canvas/**/*.scss'], ['sass']);
+	gulp.watch(['canvas/**/*.scss'], ['sassDataType']);
     gulp.watch(jsFiles, ['js']);
 });
 

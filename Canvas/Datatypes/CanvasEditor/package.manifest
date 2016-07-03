@@ -1,0 +1,17 @@
+﻿{
+	propertyEditors: [
+	{
+		alias: "Canvas.Editor",
+		name: "Canvas editor",
+		editor: {
+			view: "~/App_Plugins/Canvas/canvasEditor.html",
+			valueType: "JSON"   
+		}
+	}],
+	"css": [
+		"~/App_Plugins/Canvas/canvasEditor.css"
+	],
+	javascript: [
+		'~/App_Plugins/Canvas/canvasEditor.controller.js',
+	]
+}

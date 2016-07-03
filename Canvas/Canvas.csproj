@@ -300,6 +300,7 @@
     <None Include="Canvas\content\fonts\canvas.eot" />
     <None Include="Canvas\content\fonts\canvas.ttf" />
     <None Include="Canvas\content\fonts\canvas.woff" />
+    <None Include="Canvas\scss\canvasEditor.scss" />
     <None Include="Canvas\scss\styles.scss" />
     <None Include="Canvas\views\BackEnd.cshtml" />
     <None Include="Canvas\views\FrontEnd.cshtml" />
@@ -311,11 +312,11 @@
     <None Include="Canvas\views\Samples\RichText\RichText.cshtml" />
     <None Include="Canvas\views\Samples\Section\Boostrap - Container.cshtml" />
     <None Include="Canvas\views\Samples\Text\Bloquote .cshtml" />
+    <None Include="Datatypes\CanvasEditor\package.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Canvas\content\fonts\canvas.svg" />
-    <Content Include="Canvas\content\svg\vettvangur.svg" />
     <Content Include="Canvas\css\styles.css" />
     <Content Include="Canvas\css\styles.min.css" />
     <Content Include="Canvas\index.html" />
@@ -324,6 +325,9 @@
     <Content Include="Canvas\js\dist\app.min.js" />
     <Content Include="Canvas\js\libs\builder.js" />
     <Content Include="Canvas\js\libs\sortable.js" />
+    <Content Include="Datatypes\CanvasEditor\canvasEditor.controller.js" />
+    <Content Include="Datatypes\CanvasEditor\canvaseditor.css" />
+    <Content Include="Datatypes\CanvasEditor\canvasEditor.html" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Canvas\views\Templates\Grid\" />

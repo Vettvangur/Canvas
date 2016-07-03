@@ -123,8 +123,6 @@
             {
                                                                                                                     
                 var colNumber = col.Split(':')[0];
-                var screen = col.Split(':')[1];
-                var config = col.Split(':')[2];
 
                 string areaAlias = "grid-" + colNumber + "-" + control.ControlID + "-" + c;
 
@@ -213,7 +211,7 @@
 
 @helper RenderTextControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
 {
-    string body = control.Content;
+    string body = HttpUtility.HtmlDecode(control.Content);
     string title = control.Title;
 
     if (string.IsNullOrWhiteSpace(body))

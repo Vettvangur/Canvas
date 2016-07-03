@@ -1,0 +1,148 @@
+/*************************************************/
+/**************** Canvas DataType ****************/
+/*************************************************/
+@mixin canvas-clearfix {
+  &::before,
+  &::after {
+    content: ' ';
+    display: table;
+  }
+
+  &::after {
+    clear: both;
+  }
+}
+
+.canvas-wrapper {
+    box-sizing: border-box !important;
+
+    * {
+        box-sizing: border-box !important;
+    }
+}
+
+.canvasTabs {
+    border-bottom: 1px solid #d9d9d9;
+    list-style:none;
+    @include canvas-clearfix;
+    margin: 20px 0;
+
+    > li {
+        float:left;
+        margin-left:2px;
+
+        &:first-child {
+            margin-left:0;
+        }
+
+        &.active {
+            border: 1px solid #d9d9d9;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+        }
+
+        > a {
+            float:left;
+            padding:10px 20px;
+            cursor:pointer;
+            text-decoration:none;
+        }
+    }
+}
+
+.canvasContent {
+
+    > .canvasRootArea  {
+        display:none;
+
+        &.canvasShow {
+            display:block;
+        }
+    }
+}
+
+.canvas-control {
+    height:80px;
+    background-color:#eee;
+    margin-bottom:10px;
+    text-align: center;
+    line-height: 80px;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+        background-color:#ddd;
+    }
+
+}
+
+.canvas-grid {
+    @include canvas-clearfix;
+    margin:10px 0;
+    border: 1px solid #ddd;
+    padding: 10px;
+    min-height: 80px;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+        border-color:#bbb;
+    }
+}
+
+.canvas-section {
+    @include canvas-clearfix;
+    margin:10px 0;
+    border: 1px solid #ddd;
+    padding: 10px;
+    min-height: 80px;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+        border-color:#bbb;
+    }
+}
+
+.canvas-column {
+    float:left;
+    position: relative;
+    min-height: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+
+
+    &.canvas-col-1 {
+        width:8.333333333333332%;
+    }
+    &.canvas-col-2 {
+        width:16.666666666666664%;
+    }
+    &.canvas-col-3 {
+        width:25%;
+    }
+    &.canvas-col-4 {
+        width:33.33333333333333%
+    }
+    &.canvas-col-5 {
+        width:41.66666666666667%;
+    }
+    &.canvas-col-6 {
+        width:50%;
+    }
+    &.canvas-col-7 {
+        width:58.333333333333336%;
+    }
+    &.canvas-col-8 {
+        width:66.66666666666666%;
+    }
+    &.canvas-col-9 {
+        width:75%;
+    }
+    &.canvas-col-10 {
+        width:83.33333333333334%;
+    }
+    &.canvas-col-11 {
+        width:91.66666666666666%;
+    }
+    &.canvas-col-12 {
+        width:100%;
+    }
+}

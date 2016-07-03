@@ -186,7 +186,7 @@
 
 @helper RenderTextControl(Canvas.Models.CanvasControl control, string templatePath, CanvasModel model)
 {
-    string body = control.Content;
+    string body = HttpUtility.HtmlDecode(control.Content);
     string title = control.Title;
 
     if (control.Type  == "Text")

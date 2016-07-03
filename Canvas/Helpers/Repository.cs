@@ -112,7 +112,7 @@ namespace Canvas.Helpers
 
         }
 
-        public static void SaveJson(CanvasModel model, int pageId)
+        public static bool SaveJson(CanvasModel model, int pageId)
         {
 
             try
@@ -124,12 +124,18 @@ namespace Canvas.Helpers
                 node.SetValue("canvas", newJson.ToString());
 
                 cs.Save(node);
+
+                return true;
             }
             catch (Exception ex)
             {
 
                 Log.Error("Canvas error on SaveJson in Repository.", ex);
+
+                return false;
             }
+
+            
 
         }
     }

@@ -51,9 +51,11 @@ namespace Canvas.Controllers
                 if (AreaResult != null)
                 {
 
-                    var control = new CanvasControl();
-                    control.ControlID = controlId;
-                    control.Type = controlType;
+                    var control = new CanvasControl
+                    {
+                        ControlID = controlId,
+                        Type = controlType
+                    };
 
                     // If control is grid then create area inside it
 
@@ -67,9 +69,8 @@ namespace Canvas.Controllers
 
                             string col = column.Split(':')[0];
 
-                            var area = new CanvasArea();
+                            var area = new CanvasArea {Alias = "grid-" + col + "-" + controlId.ToString() + "-" + p};
 
-                            area.Alias = "grid-" + col + "-" + controlId.ToString() + "-" + p;
 
                             control.Areas.Add(area);
 
@@ -83,8 +84,7 @@ namespace Canvas.Controllers
 
                     if (controlType == "Section")
                     {
-                        var area = new CanvasArea();
-                        area.Alias = "section-" + controlId.ToString();
+                        var area = new CanvasArea {Alias = "section-" + controlId.ToString()};
 
                         control.Areas.Add(area);
                     }
@@ -105,13 +105,13 @@ namespace Canvas.Controllers
 
                 var m = new CanvasModel();
 
-                var area = new CanvasArea();
+                var area = new CanvasArea {Alias = areaAlias};
 
-                area.Alias = areaAlias;
-
-                var control = new CanvasControl();
-                control.ControlID = controlId;
-                control.Type = controlType;
+                var control = new CanvasControl
+                {
+                    ControlID = controlId,
+                    Type = controlType
+                };
 
                 area.Controls.Add(control);
 
@@ -152,7 +152,7 @@ namespace Canvas.Controllers
                 if (areaDraggedFrom != null)
                 {
 
-                    control = areaDraggedFrom.Controls.Where(x => x.ControlID == controlId).FirstOrDefault();
+                    control = areaDraggedFrom.Controls.FirstOrDefault(x => x.ControlID == controlId);
 
                     areaDraggedFrom.Controls.Remove(control);
 
@@ -179,7 +179,7 @@ namespace Canvas.Controllers
                 if (areaDraggedFrom != null)
                 {
 
-                    control = areaDraggedFrom.Controls.Where(x => x.ControlID == controlId).FirstOrDefault();
+                    control = areaDraggedFrom.Controls.FirstOrDefault(x => x.ControlID == controlId);
 
                     areaDraggedFrom.Controls.Remove(control);
 
@@ -258,7 +258,6 @@ namespace Canvas.Controllers
         {
 
             var controlId = new Guid(form["controlId"]);
-            var areaAlias = form["area"];
             var pageId = form["pageId"];
             var controlType = form["controlType"];
 
@@ -277,12 +276,12 @@ namespace Canvas.Controllers
                 if (AreaControlResult != null)
                 {
 
-                    var control = AreaControlResult.Controls.Where(x => x.ControlID == controlId).FirstOrDefault();
+                    var control = AreaControlResult.Controls.FirstOrDefault(x => x.ControlID == controlId);
 
                     if (control != null)
                     {
 
-                        var controlProperties = control.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(control, null) == null ? "" : x.GetValue(control, null)).ToList();
+                        var controlProperties = control.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(control, null) ?? "").ToList();
 
                         foreach (var property in controlProperties)
                         {
@@ -302,7 +301,10 @@ namespace Canvas.Controllers
                                 PropertyInfo prop = control.GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
                                 if (null != prop && prop.CanWrite)
                                 {
-                                    prop.SetValue(control, HttpUtility.UrlDecode(value), null);
+                                    Log.Info(value);
+                                    Log.Info(HttpContext.Server.HtmlEncode(value));
+
+                                    prop.SetValue(control, HttpContext.Server.HtmlEncode(value), null);
                                 }
 
                             }
@@ -335,7 +337,7 @@ namespace Canvas.Controllers
 
                                 p++;
 
-                                var AreaInsideGrid = AreasInsideGrid.Where(x => x.Alias == colAreaAlis).FirstOrDefault();
+                                var AreaInsideGrid = AreasInsideGrid.FirstOrDefault(x => x.Alias == colAreaAlis);
 
                                 if (AreaInsideGrid == null)
                                 {
@@ -366,9 +368,11 @@ namespace Canvas.Controllers
 
                                     string col = column.Split(':')[0];
 
-                                    var area = new CanvasArea();
+                                    var area = new CanvasArea
+                                    {
+                                        Alias = "grid-" + col + "-" + controlId.ToString() + "-" + p
+                                    };
 
-                                    area.Alias = "grid-" + col + "-" + controlId.ToString() + "-" + p;
 
                                     control.Areas.Insert(p, area);
 
@@ -383,9 +387,9 @@ namespace Canvas.Controllers
                 }
             }
 
-            Repository.SaveJson(model, Convert.ToInt32(pageId));
+            var saveStatus = Repository.SaveJson(model, Convert.ToInt32(pageId));
 
-            return Json(new { success = true, html = "" });
+            return Json(new { success = saveStatus });
         }
 
         [HttpPost]
@@ -407,7 +411,7 @@ namespace Canvas.Controllers
                 if (AreaControlResult != null)
                 {
 
-                    var control = AreaControlResult.Controls.Where(x => x.ControlID == controlId).FirstOrDefault();
+                    var control = AreaControlResult.Controls.FirstOrDefault(x => x.ControlID == controlId);
 
                     AreaControlResult.Controls.Remove(control);
 
@@ -480,13 +484,22 @@ namespace Canvas.Controllers
 
             var versions = cs.GetVersions(page.Id);
 
-            cs.Rollback(page.Id, versions.Where(x => x.Published).FirstOrDefault().Version);
+            var lastPublishedVersion = versions.FirstOrDefault(x => x.Published);
 
-            var pageAfterRollback = cs.GetById(pageId);
+            if (lastPublishedVersion != null)
+            {
+                cs.Rollback(page.Id, lastPublishedVersion.Version);
 
-            cs.SaveAndPublishWithStatus(pageAfterRollback);
+                var pageAfterRollback = cs.GetById(pageId);
 
-            return Json(new { success = true });
+                cs.SaveAndPublishWithStatus(pageAfterRollback);
+
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false });
+
+
         }
 
         [HttpPost]
@@ -505,7 +518,7 @@ namespace Canvas.Controllers
                     foreach (var p in properties)
                     {
 
-                        var type = macroPropertyTypes.Where(x => x.id == p.macroPropertyType).FirstOrDefault();
+                        var type = macroPropertyTypes.FirstOrDefault(x => x.id == p.macroPropertyType);
 
                         if (type != null)
                         {
@@ -548,13 +561,14 @@ namespace Canvas.Controllers
             foreach (var p in pages)
             {
 
-                var e = new CanvasContent();
-
-                e.contentType = p.ContentType.Alias;
-                e.id = p.Id;
-                e.name = p.Name;
-                e.url = p.Url;
-                e.hasChildren = false;
+                var e = new CanvasContent
+                {
+                    contentType = p.ContentType.Alias,
+                    id = p.Id,
+                    name = p.Name,
+                    url = p.Url,
+                    hasChildren = false
+                };
 
                 if (p.Children().Any())
                 {
@@ -602,7 +616,7 @@ namespace Canvas.Controllers
             using (var db = DatabaseContext.Database)
             {
 
-                string sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src1, MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src2 FROM umbracoNode as n " +
+                var sql = "SELECT MIN(n.id) as id ,MIN(n.parentID) as parentId ,MIN(n.sortOrder) as sortOrder,MIN(n.text) as text,MIN(cmsContent.contentType) as contentType,MIN(cast(cmsPropertyData.dataNtext as varchar(max))) as src1, MIN(cast(cmsPropertyData.dataNvarchar as varchar(max))) as src2 FROM umbracoNode as n " +
                 "INNER JOIN cmsContent ON n.id=cmsContent.nodeId  " +
                 "RIGHT JOIN cmsPropertyData ON n.id=cmsPropertyData.contentNodeId " +
                 "WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND  " +
@@ -642,9 +656,9 @@ namespace Canvas.Controllers
         {
             var item = Umbraco.TypedMedia(id);
 
-            string url = string.Empty;
-            string type = string.Empty;
-            string name = string.Empty;
+            var url = string.Empty;
+            var type = string.Empty;
+            var name = string.Empty;
 
             if (item != null)
             {
@@ -868,7 +882,7 @@ namespace Canvas.Controllers
         private void FindAreaWithControl(CanvasArea area, Guid controlId)
         {
 
-            var control = area.Controls.Where(x => x.ControlID == controlId).FirstOrDefault();
+            var control = area.Controls.FirstOrDefault(x => x.ControlID == controlId);
 
             if (control != null)
             {

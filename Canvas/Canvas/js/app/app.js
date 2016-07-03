@@ -739,13 +739,22 @@
                     data: $form.serialize(),
                     success: function (json) {
 
-                        app.params.getIframeWindow().location.reload();
+                        app.helpers.loader.stop();
                         $button.removeAttr('disabled');
-                        app.helpers.isPagePublished();
+
+                        if (json.success) {
+                            app.params.getIframeWindow().location.reload();
+                        } else {
+                            app.helpers.message('error',
+                                'Sorry but there was an error while saving your content. Check if there is something wrong with the content or try to reload the page and try again.');
+                        }
+
                     },
                     error: function (a, b, c) {
                         app.helpers.loader.stop();
                         $button.removeAttr('disabled');
+                        app.helpers.message('error',
+                            'Sorry but there was an server error while trying to save the content. Please contact web administrator.');
                     }
                 });
 
@@ -2595,6 +2604,20 @@
                     return me.map[s];
                 });
             }
+        },
+
+        message: function (type, message) {
+
+            $('.canvas-message').remove();
+
+            $('body').append('<div class="canvas-message ' + type + '">' + message + ' <a href="#">Close message</a></div>');
+
+            $('.canvas-message > a').on('click', function(e) {
+                e.preventDefault();
+
+                $('.canvas-message').remove();
+
+            });
         }
 
     };

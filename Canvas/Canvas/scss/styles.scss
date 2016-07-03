@@ -1,14 +1,14 @@
 /****************************************/
-/**************** Canvas ****************/
+/**************** Canvas Editor ****************/
 /****************************************/
 
 // Global
 
-.canvas-bar *,.canvas-footer *, .canvas-footer {
+.canvas-bar *,.canvas-footer *, .canvas-footer, .canvas-message {
     box-sizing: border-box !important;
 }
 
-.canvas-menu, .canvas-menu, .canvas-window *,.canvas-overlay *, .canvas-overlap * {
+.canvas-menu, .canvas-menu, .canvas-window *,.canvas-overlay *, .canvas-overlap *, .canvas-message {
     box-sizing: border-box !important;
     font-size:14px !important;
     font-family:Arial !important;
@@ -1156,6 +1156,34 @@ body.canvas-body {
     //opacity:0.6;
 }
 
+// Canvas Message
+.canvas-message {
+    position: fixed;
+    top: 60px;
+    width: 100%;
+    padding: 15px;
+    z-index: 2000000010;
+
+    > a {
+        color:#fff;
+        float:right;
+        text-decoration:underline;
+    }
+
+    &.error {
+        background: #f2295b;
+        color: #fff;
+    }
+
+    &.warning {
+
+    }
+
+    &.success {
+
+    }
+}
+
 // Canvas Loader
 
 .canvas-progress-loader {
@@ -1284,7 +1312,7 @@ body.canvas-body {
 
 @font-face {
   font-family: "canvas";
-  src:url("../content/fonts/canvas.eot");
+  src:url("/umbraco/canvas/content/fonts/canvas.eot");
   src:url("../content/fonts/canvas.eot?#iefix") format("embedded-opentype"),
     url("../content/fonts/canvas.woff") format("woff"),
     url("../content/fonts/canvas.ttf") format("truetype"),
