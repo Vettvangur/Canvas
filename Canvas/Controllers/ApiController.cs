@@ -301,9 +301,6 @@ namespace Canvas.Controllers
                                 PropertyInfo prop = control.GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
                                 if (null != prop && prop.CanWrite)
                                 {
-                                    Log.Info(value);
-                                    Log.Info(HttpContext.Server.HtmlEncode(value));
-
                                     prop.SetValue(control, HttpContext.Server.HtmlEncode(value), null);
                                 }
 

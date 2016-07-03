@@ -1313,10 +1313,10 @@ body.canvas-body {
 @font-face {
   font-family: "canvas";
   src:url("/umbraco/canvas/content/fonts/canvas.eot");
-  src:url("../content/fonts/canvas.eot?#iefix") format("embedded-opentype"),
-    url("../content/fonts/canvas.woff") format("woff"),
-    url("../content/fonts/canvas.ttf") format("truetype"),
-    url("../content/fonts/canvas.svg#canvas") format("svg");
+  src:url("/umbraco/canvas/content/fonts/canvas.eot?#iefix") format("embedded-opentype"),
+    url("/umbraco/canvas/content/fonts/canvas.woff") format("woff"),
+    url("./umbraco/canvas/content/fonts/canvas.ttf") format("truetype"),
+    url("/umbraco/canvas/content/fonts/canvas.svg#canvas") format("svg");
   font-weight: normal;
   font-style: normal;
 
