@@ -744,6 +744,7 @@
 
                         if (json.success) {
                             app.params.getIframeWindow().location.reload();
+                            app.helpers.isPagePublished();
                         } else {
                             app.helpers.message('error',
                                 'Sorry but there was an error while saving your content. Check if there is something wrong with the content or try to reload the page and try again.');
