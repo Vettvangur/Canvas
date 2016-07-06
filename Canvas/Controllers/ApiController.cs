@@ -457,7 +457,9 @@ namespace Canvas.Controllers
 
                 var page = cs.GetById(pageId);
 
-                cs.SaveAndPublishWithStatus(page);
+                var currentUser = Authorize.GetCurrentUser();
+
+                cs.SaveAndPublishWithStatus(page,currentUser.Id);
 
                 return Json(new { success = true });
 

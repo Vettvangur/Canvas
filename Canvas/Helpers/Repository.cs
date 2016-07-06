@@ -123,7 +123,9 @@ namespace Canvas.Helpers
 
                 node.SetValue("canvas", newJson.ToString());
 
-                cs.Save(node);
+                var currentUser = Authorize.GetCurrentUser();
+
+                cs.Save(node, currentUser.Id);
 
                 return true;
             }
