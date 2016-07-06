@@ -108,13 +108,27 @@
                                                     
     string columns = "";
     string row = "";    
-                                                                                                                                                     
+               
+    string mediaId = control.Item;
+    string imageUrl = "";
+                                                       
+    if (!string.IsNullOrEmpty(mediaId))
+    {
+        var media = Umbraco.TypedMedia(mediaId);
+
+        if (media != null)
+        {
+            imageUrl = media.Url;
+        }
+    }
+                                                                                                                                        
     if (!string.IsNullOrEmpty(templatePath))
     {
         var obj = new ViewDataDictionary();
 
         obj.Add("columns", cols);
         obj.Add("class", Class);
+        obj.Add("media", imageUrl);
 
         foreach (var col in cols)
         {
