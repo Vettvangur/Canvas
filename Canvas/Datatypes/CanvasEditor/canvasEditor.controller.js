@@ -193,9 +193,9 @@
 
     function getContent() {
 
-        if (typeof $scope.nodeId !== 'undefined') {
+        if (typeof $routeParams.id !== 'undefined') {
 
-            contentResource.getById($scope.nodeId)
+            contentResource.getById($routeParams.id)
                 .then(function (content) {
 
                     var properties = contentEditingHelper.getAllProps(content);
