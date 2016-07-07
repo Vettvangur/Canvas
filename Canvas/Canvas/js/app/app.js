@@ -840,9 +840,7 @@
                     case "Item":
 
                         if (controlType == "Media" || controlType == "Section" || controlType == "Grid") {
-
                             $property = me.build('Umbraco.MediaPicker', propertyName, propertyName, propertyValue);
-
                         }
 
                         break;

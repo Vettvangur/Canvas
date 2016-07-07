@@ -192,28 +192,35 @@
     }
 
     function getContent() {
-        contentResource.getById($routeParams.id)
-            .then(function (content) {
 
-                var properties = contentEditingHelper.getAllProps(content);
-                var canvasValue = $scope.GetPropertyValue('canvas', properties);
+        if (typeof $scope.nodeId !== 'undefined') {
 
-                $scope.latestValue = canvasValue;
+            contentResource.getById($scope.nodeId)
+                .then(function (content) {
 
-                if (content.urls.length > 0) {
+                    var properties = contentEditingHelper.getAllProps(content);
+                    var canvasValue = $scope.GetPropertyValue('canvas', properties);
 
-                    var href = content.urls[0];
+                    $scope.latestValue = canvasValue;
 
-                    var l = document.createElement("a");
+                    if (content.urls.length > 0) {
 
-                    l.href = href;
+                        var href = content.urls[0];
 
-                    $scope.url = href;
-                    $scope.host = l.origin;
-                    $scope.pathname = l.pathname;
-                }
+                        var l = document.createElement("a");
 
-            });
+                        l.href = href;
+
+                        $scope.url = href;
+                        $scope.host = l.origin;
+                        $scope.pathname = l.pathname;
+                    }
+
+                });
+
+        }
+
+
     }
 
     function updateIdle() {
