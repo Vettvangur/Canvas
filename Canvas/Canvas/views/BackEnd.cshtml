@@ -370,7 +370,8 @@ if (media != null)
 
 @helper RenderMacroControl(Canvas.Models.CanvasControl control, IContent page, string templatePath, CanvasModel model)
 {
-    string macroValue = control.Macro;
+
+    string macroValue = HttpUtility.HtmlDecode(control.Macro);
 
     if (!string.IsNullOrEmpty(macroValue))
     {
@@ -391,18 +392,21 @@ if (media != null)
             parameters.Add(tag, value);
         }
 
+        var renderdMacro = Umbraco.RenderMacro(macroAlias,parameters).ToString();
+
         if (!string.IsNullOrEmpty(templatePath))
         {
             var obj = new ViewDataDictionary();
 
             obj.Add("alias", macroAlias);
             obj.Add("parameters", parameters);
+            obj.Add("macro",renderdMacro);
 
             @Html.Partial("~" + templatePath, page, obj)
 
         }
         else {
-            @Umbraco.RenderMacro(macroAlias,parameters)
+            @renderdMacro
         }
 
     } else {

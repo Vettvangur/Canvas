@@ -331,7 +331,7 @@
 
 @helper RenderMacroControl(Canvas.Models.CanvasControl control, string templatePath, CanvasModel model)
 {
-    string macroValue = control.Macro;
+    string macroValue = HttpUtility.HtmlDecode(control.Macro);
 
     if (!string.IsNullOrEmpty(macroValue))
     {
@@ -352,19 +352,22 @@
             parameters.Add(tag, value);
         }
 
+        var renderdMacro = Umbraco.RenderMacro(macroAlias,parameters).ToString();
+
         if (!string.IsNullOrEmpty(templatePath))
         {
             var obj = new ViewDataDictionary();
 
             obj.Add("alias", macroAlias);
             obj.Add("parameters", parameters);
+            obj.Add("macro", renderdMacro);
 
             @Html.Partial("~" + templatePath, Model.node, obj)
 
         }
         else {
 
-            @Umbraco.RenderMacro(macroAlias, parameters)
+            @renderdMacro
         }
 
     }

@@ -237,7 +237,7 @@ namespace Canvas.Controllers
                             }
                         }
 
-                        var controlProperties = control.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(control, null) == null ? "" : x.GetValue(control, null)).ToList();
+                        var controlProperties = control.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(control, null) == null ? "" : HttpUtility.HtmlDecode(x.GetValue(control, null).ToString())).ToList();
 
                         return Json(new { success = true, controlId = controlId, properties = controlProperties, templates = templates, type = control.Type, macros = macros }, JsonRequestBehavior.AllowGet);
 
