@@ -193,7 +193,7 @@
 
     function getContent() {
 
-        if (typeof $routeParams.id !== 'undefined') {
+        if (typeof $routeParams.id !== 'undefined' && $routeParams.tree === 'content' && typeof $routeParams.create === 'undefined') {
 
             contentResource.getById($routeParams.id)
                 .then(function (content) {
@@ -237,7 +237,7 @@
 
         if (JSON.stringify($scope.latestValue) !== JSON.stringify(root)) {
             notificationsService.warning("Warning",
-                "There have been some changes to the content since you opened the node in Umbraco, please reload and try again.");
+                "There have been some changes to the Canvas content since you opened the node in Umbraco, please reload and try again.");
             currentForm.$setValidity('canvas', false);
         }
 
