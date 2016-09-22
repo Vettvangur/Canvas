@@ -239,6 +239,15 @@
       <HintPath>..\packages\UmbracoCms.Core.7.4.3\lib\Umbraco.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Umbraco.Courier.Core">
+      <HintPath>..\..\..\..\Users\garda\Desktop\Umbraco.Courier.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Courier.DataResolvers">
+      <HintPath>..\..\..\..\Users\garda\Desktop\Umbraco.Courier.DataResolvers.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Courier.Providers">
+      <HintPath>..\..\..\..\Users\garda\Desktop\Umbraco.Courier.Providers.dll</HintPath>
+    </Reference>
     <Reference Include="umbraco.DataLayer, Version=1.0.5948.18143, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UmbracoCms.Core.7.4.3\lib\umbraco.DataLayer.dll</HintPath>
       <Private>True</Private>
@@ -280,6 +289,7 @@
     <Compile Include="API.cs" />
     <Compile Include="CanvasMenu.cs" />
     <Compile Include="Controllers\ApiController.cs" />
+    <Compile Include="Courier\CanvasDataResolver.cs" />
     <Compile Include="Helpers\Authorize.cs" />
     <Compile Include="Helpers\AuthorizeUserAttribute.cs" />
     <Compile Include="Helpers\CanvasHelper.cs" />
