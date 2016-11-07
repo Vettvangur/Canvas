@@ -1,7 +1,7 @@
 Canvas - Live Content editor for Umbraco
 =========
 
-**1st Price in the package competition at Codegarden 16.**
+**1st Place in the package competition at Codegarden 16.**
 
 ### Package install ###
 Download newest release from https://github.com/vettvangur/Canvas/releases.
