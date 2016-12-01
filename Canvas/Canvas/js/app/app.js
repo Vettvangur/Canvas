@@ -4,7 +4,7 @@
 
     // -----------
     app.params = {
-        $body: function() {
+        $body: function () {
             return $('body');
         },
         apiUrl: '/umbraco/canvas/api',
@@ -14,7 +14,7 @@
         pageUrl: function () {
             return app.helpers.getQueryString("url").url;
         },
-        getIframeContent: function() {
+        getIframeContent: function () {
             var iframe = document.getElementById('canvas-iframe');
 
             return iframe.contentDocument;
@@ -133,7 +133,7 @@
             $(window).resize(function () {
                 me.resizeIframe();
             });
-            
+
 
         },
 
@@ -207,7 +207,7 @@
 
         },
 
-        controlMenu: function() {
+        controlMenu: function () {
             $('body').on('click', '.canvas-item-menu', function (e) {
                 e.preventDefault();
 
@@ -220,7 +220,7 @@
     // Canvas Footer
     // -----------
     app.footer = {
-        init: function() {
+        init: function () {
             var me = this;
 
             me.render();
@@ -262,7 +262,7 @@
 
         render: function () {
 
-           
+
             var $menu = $('<div><div class="canvas-menu">' +
                     '<ul class="canvas-controls" id="canvas-controls">' +
                     '</ul>' +
@@ -437,7 +437,7 @@
 
                     app.helpers.loader.stop();
 
-                    var $controlWrapper = me.renderControlWrapper(json.controlType,json.controlId);
+                    var $controlWrapper = me.renderControlWrapper(json.controlType, json.controlId);
 
                     var position = app.params.controlIndex;
 
@@ -633,9 +633,9 @@
                         + '<input type="hidden" name="controlType" value="' + json.type + '" />'
                         + '</form></div>');
 
-                    $(json.properties).each(function (i,o) {
+                    $(json.properties).each(function (i, o) {
 
-                        var $property = me.propertiesBuilder.renderProperty(o.Key,json.type,o.Value,json);
+                        var $property = me.propertiesBuilder.renderProperty(o.Key, json.type, o.Value, json);
 
                         $form.find('form').append($property);
                     });
@@ -666,7 +666,7 @@
         },
 
         postEdit: function ($form) {
-        
+
             $form.on('submit', function (e) {
 
                 e.preventDefault();
@@ -681,7 +681,7 @@
 
                     var $macroControlGroup = $(this).parent();
                     var $inputMacro = $macroControlGroup.find('input[name=Macro]');
-  
+
                     $(this).find('.canvas-control-group').each(function (i, v) {
 
                         var input = $(this).find('input,textarea,select');
@@ -1047,8 +1047,8 @@
 
                     property = $('<div class="canvas-control-group">'
                         + '<label for="' + alias + '">' + name + '</label>'
-                        + '<div class="canvas-multipleContentPicker-Items">'
-                        + '</div>'
+                        + '<ul class="canvas-multipleContentPicker-Items">'
+                        + '</ul>'
                         + '<input type="hidden" name="' + alias + '" id="' + alias + '" value="' + value + '" />'
                         + '</div>');
 
@@ -1065,9 +1065,9 @@
 
                                     app.helpers.loader.stop();
 
-                                    var $item = $('<div><div class="canvas-multipleContentPicker-Item" data-itemId="' + json.id + '">'
+                                    var $item = $('<div><li class="canvas-multipleContentPicker-Item tile" data-itemId="' + json.id + '">'
                                     + '<a href="#" class="canvas-ContentPicker ' + (json.id != '' ? 'canvas-MultipleContentPicker-remove' : 'canvas-MultipleContentPicker-add') + '" >' + json.name + '</a>'
-                                    + '</div></div>');
+                                    + '</li></div>');
 
                                     property.find('.canvas-multipleContentPicker-Items').append($item.html());
 
@@ -1080,9 +1080,9 @@
                         }
                     }
 
-                    var $itemAdd = $('<div><div class="canvas-multipleContentPicker-Item">'
+                    var $itemAdd = $('<div><li class="canvas-multipleContentPicker-Item" draggable="false">'
                     + '<a href="#" class="canvas-ContentPicker canvas-MultipleContentPicker-add" >Add</a>'
-                    + '</div></div>');
+                    + '</li></div>');
 
                     property.find('.canvas-multipleContentPicker-Items').append($itemAdd.html());
 
@@ -1211,7 +1211,6 @@
                         + '</div>');
                 }
 
-
                 return property;
             },
 
@@ -1262,6 +1261,32 @@
                         });
 
                         propWrapper.insertAfter(select);
+
+                        var el = document.querySelector('.canvas-multipleContentPicker-Items');
+                        Sortable.create(el, {
+                            onUpdate: function (evt) {
+
+                                // Would be better to pick the cointainer from evt
+                                var $container = $(".canvas-multipleContentPicker-Items").closest('.canvas-control-group');
+
+                                var list = [];
+
+                                $('.canvas-multipleContentPicker-Items').find('li').each(function () {
+                                    var current = $(this);
+
+                                    if (current.attr('data-itemId') != null) {
+                                        list.push(current.attr('data-itemId'));
+                                    }
+                                });
+
+                                var newlist = list.join(",");
+
+                                $container.find('input').attr("value", newlist);
+
+                            },
+                            draggable: ".tile", 
+                        });
+
                     },
                     error: function (a, b, c) {
 
@@ -1311,7 +1336,7 @@
     // -----------
     app.modules = {
 
-        init: function() {
+        init: function () {
             this.templates.init();
             this.settings.init();
             this.advanced();
@@ -1332,7 +1357,7 @@
                     $overlay.find('.canvas-container').append($editor);
 
                     $('body').append($overlay.fadeIn());
-                    
+
                     var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("canvas-codeEditor"), app.modules.codeMirror.config);
 
                     app.modules.codeMirror.setMode(myCodeMirror, 'xml');
@@ -1667,8 +1692,8 @@
         settings: {
 
             init: function () {
-                
-                $('body').on('click','.canvas-item-settings', function (e) {
+
+                $('body').on('click', '.canvas-item-settings', function (e) {
 
                     e.preventDefault();
 
@@ -1858,7 +1883,7 @@
     // -----------
     app.pickers = {
 
-        init: function() {
+        init: function () {
             this.contentPicker.init();
             this.multipleContentPicker.init();
         },
@@ -2036,12 +2061,22 @@
 
                     var itemId = $item.attr('data-itemId');
 
-                    $container.find('input').val($container.find('input').val().replace(',' + itemId, '').replace(itemId, ''));
+                    var list = $container.find('input').val().split(",");
+
+                    var index = list.indexOf(itemId);
+                    if (index > -1) {
+                        list.splice(index, 1);
+                    }
+
+                    var newlist = list.join(",");
+
+                    $container.find('input').attr("value", newlist);
+
                     $item.remove();
                 });
 
 
-                $('body').on('click','.canvas-multiplecontentpicker-menu .canvas-plus', function () {
+                $('body').on('click', '.canvas-multiplecontentpicker-menu .canvas-plus', function () {
 
                     var contentId = $(this).next().attr('data-contentId');
                     var $container = $(this).parent();
@@ -2078,7 +2113,7 @@
                 });
 
 
-                $('body').on('click','.canvas-multiplecontentpicker-menu a', function (e) {
+                $('body').on('click', '.canvas-multiplecontentpicker-menu a', function (e) {
                     e.preventDefault();
 
                     var dev = ',';
@@ -2089,9 +2124,10 @@
 
                     me.params.$container.find('input').val(me.params.$container.find('input').val() + dev + $(this).attr('data-contentId'));
                     me.params.$item.find('a').text($(this).text()).removeClass('canvas-MultipleContentPicker-add').addClass('canvas-MultipleContentPicker-remove');
+                    me.params.$item.attr('data-itemId', $(this).attr('data-contentId'));
+                    me.params.$item.addClass('tile');
 
-
-                    me.params.$container.find('.canvas-multipleContentPicker-Items').append('<div class="canvas-multipleContentPicker-Item"><a href="#" class="canvas-ContentPicker canvas-MultipleContentPicker-add">Add</a></div>');
+                    me.params.$container.find('.canvas-multipleContentPicker-Items').append('<li class="canvas-multipleContentPicker-Item"><a href="#" class="canvas-ContentPicker canvas-MultipleContentPicker-add">Add</a></div>');
 
                     $('.canvas-overlap').fadeOut(function () {
 
@@ -2360,7 +2396,7 @@
                 var maxHeight = maxSize;    // Max height for the image
                 var ratio = 0;  // Used for aspect ratio
 
-                        // Check if the current width is larger than the max
+                // Check if the current width is larger than the max
                 if (width > maxWidth) {
                     ratio = maxWidth / width;   // get ratio for scaling image
 
@@ -2371,7 +2407,7 @@
                     width = width * ratio;    // Reset width to match scaled image
                 }
 
-                        // Check if current height is larger than max
+                // Check if current height is larger than max
                 if (height > maxHeight) {
                     ratio = maxHeight / height; // get ratio for scaling image
 
@@ -2383,8 +2419,8 @@
                 return retval;
             },
 
-            canvasResizeImage: function(editor) {
-            
+            canvasResizeImage: function (editor) {
+
                 var me = this;
 
                 editor.on('mouseup', function (e) {
@@ -2396,7 +2432,7 @@
                         if (mySelection.src.indexOf("width") != -1) {
 
                             setTimeout(
-                                me.fixSize(mySelection,editor),
+                                me.fixSize(mySelection, editor),
                                 100
                             );
                         }
@@ -2406,11 +2442,11 @@
 
             },
 
-            fixSize: function (el,editor) {
+            fixSize: function (el, editor) {
                 newWidth = el.width;
                 newHeight = el.height;
-                newUrl = el.src.replace(/width=[0-9]+/,"width="+newWidth);
-                newUrl = newUrl.replace(/height=[0-9]+/,"height="+newHeight);
+                newUrl = el.src.replace(/width=[0-9]+/, "width=" + newWidth);
+                newUrl = newUrl.replace(/height=[0-9]+/, "height=" + newHeight);
 
                 editor.dom.setAttrib(el, 'src', newUrl);
             }
@@ -2437,7 +2473,7 @@
 
                 setTimeout(function () {
                     $window.html('');
-                },300);
+                }, 300);
 
             });
 
@@ -2610,7 +2646,7 @@
 
             $('body').append('<div class="canvas-message ' + type + '">' + message + ' <a href="#">Close message</a></div>');
 
-            $('.canvas-message > a').on('click', function(e) {
+            $('.canvas-message > a').on('click', function (e) {
                 e.preventDefault();
 
                 $('.canvas-message').remove();
@@ -2630,7 +2666,7 @@
         app.modules.init();
         app.helpers.init();
         $('body').append('<div class="canvas-window"></div>');
-        
+
         // globalize scope
         CanvasApp = app;
 
