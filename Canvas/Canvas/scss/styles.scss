@@ -741,6 +741,15 @@ body.canvas-body {
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAOVBMVEX///8uiuuw6f//6e9oiurx8Pf/9/doufXOz/Lruevk9//R8P/x9/yq2vf/8PHx2u6Pqu6qqu1iiupHkvr2AAAAMklEQVQI12MAAj5BAW4GCGBmYWRCY7KxsvILMfKysvIwcDJCATsyE6EWN5ONg4MLSAEARQIBEn0ykwYAAAAASUVORK5CYII=');
         }
 
+        .canvas-multipleContentPicker-Items {
+            margin: 0;
+            padding: 0;
+
+            .canvas-multipleContentPicker-Item {
+                list-style: none;
+            }
+        }
+
         .canvas-ContentPicker.canvas-ContentPicker-remove:before, .canvas-ContentPicker.canvas-MultipleContentPicker-remove:before {
             width: 9px;
             height: 8px;
