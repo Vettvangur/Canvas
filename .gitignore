@@ -94,18 +94,6 @@ UmbracoTraceLog.txt
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 
-#
-# Umbraco
-#
-Umbraco.Site/Umbraco.Site/App_Data/Logs/UmbracoTraceLog.txt
-Umbraco.Site/Umbraco.Site/App_Data/Logs/*
-Umbraco.Site/Umbraco.Site/App_Data/TEMP/
-Umbraco.Site/Umbraco.Site/App_Data/preview/
-Umbraco.Site/Umbraco.Site/App_Data/umbraco.config
-Umbraco.Site/Umbraco.Site/aspnet_client/
-Umbraco.Site/Umbraco.Site/media/
-Umbraco.Site/Umbraco.Site/imagecache/
-
 .DS_Store
 bower_components
 node_modules

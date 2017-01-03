@@ -24,6 +24,7 @@ namespace Canvas.Helpers
 
             try
             {
+
                 var View = new CanvasView();
 
                 int pageId = UmbracoContext.Current.PageId.Value;
@@ -75,7 +76,6 @@ namespace Canvas.Helpers
                         }
 
                     }
-
                     View.page = page;
                     View.viewName = "/Views/Canvas/Backend.cshtml";
 
